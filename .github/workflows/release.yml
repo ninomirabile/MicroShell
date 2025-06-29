@@ -1,0 +1,343 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.2.3)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Is this a pre-release?'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+  REGISTRY: ghcr.io
+
+jobs:
+  # ===== VALIDATE RELEASE =====
+  validate-release:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      is-prerelease: ${{ steps.version.outputs.is-prerelease }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+            IS_PRERELEASE="${{ github.event.inputs.prerelease }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/v}"
+            IS_PRERELEASE="false"
+            if [[ $VERSION =~ (alpha|beta|rc) ]]; then
+              IS_PRERELEASE="true"
+            fi
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "is-prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
+
+      - name: Validate version format
+        run: |
+          if ! [[ "${{ steps.version.outputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*)?$ ]]; then
+            echo "Invalid version format: ${{ steps.version.outputs.version }}"
+            exit 1
+          fi
+
+  # ===== BUILD AND TEST =====
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    needs: validate-release
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: |
+          npx nx run-many --target=test --all --parallel --watch=false
+          npx nx run-many --target=lint --all --parallel
+
+      - name: Build all applications
+        run: |
+          npx nx run-many --target=build --all --parallel --configuration=production
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Test backend
+        working-directory: ./backend
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio httpx
+          python -m pytest tests/ -v
+
+  # ===== GENERATE CHANGELOG =====
+  generate-changelog:
+    name: Generate Changelog
+    runs-on: ubuntu-latest
+    needs: validate-release
+    outputs:
+      changelog: ${{ steps.changelog.outputs.changelog }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fromTag: ${{ github.ref_name }}
+          toTag: HEAD
+          writeToFile: false
+
+  # ===== BUILD DOCKER IMAGES =====
+  build-docker-images:
+    name: Build Release Images
+    runs-on: ubuntu-latest
+    needs: [validate-release, build-and-test]
+    strategy:
+      matrix:
+        component: [backend, shell, dashboard, utenti, report]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}-${{ matrix.component }}
+          tags: |
+            type=semver,pattern={{version}},value=v${{ needs.validate-release.outputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=v${{ needs.validate-release.outputs.version }}
+            type=semver,pattern={{major}},value=v${{ needs.validate-release.outputs.version }}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.component == 'backend' && './backend' || '.' }}
+          file: ${{ matrix.component == 'backend' && './backend/Dockerfile' || format('./apps/{0}/Dockerfile', matrix.component) }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ===== CREATE RELEASE ARTIFACTS =====
+  create-artifacts:
+    name: Create Release Artifacts
+    runs-on: ubuntu-latest
+    needs: [validate-release, build-and-test]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build all applications
+        run: |
+          npx nx run-many --target=build --all --parallel --configuration=production
+
+      - name: Create release bundle
+        run: |
+          mkdir -p release-artifacts
+          tar -czf release-artifacts/microshell-frontend-v${{ needs.validate-release.outputs.version }}.tar.gz dist/
+          
+          # Create deployment configs
+          cp docker-compose.yml release-artifacts/
+          cp -r nginx release-artifacts/ || true
+          cp -r monitoring release-artifacts/ || true
+          
+          # Create version info
+          echo "Version: ${{ needs.validate-release.outputs.version }}" > release-artifacts/VERSION
+          echo "Build Date: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> release-artifacts/VERSION
+          echo "Commit: ${{ github.sha }}" >> release-artifacts/VERSION
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          path: release-artifacts/
+
+  # ===== CREATE GITHUB RELEASE =====
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [validate-release, build-and-test, generate-changelog, build-docker-images, create-artifacts]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts
+          path: release-artifacts/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ needs.validate-release.outputs.version }}
+          name: Release v${{ needs.validate-release.outputs.version }}
+          body: |
+            # MicroShell v${{ needs.validate-release.outputs.version }}
+            
+            ## What's Changed
+            ${{ needs.generate-changelog.outputs.changelog }}
+            
+            ## Docker Images
+            
+            The following Docker images have been published to GitHub Container Registry:
+            
+            - `ghcr.io/${{ github.repository }}-backend:${{ needs.validate-release.outputs.version }}`
+            - `ghcr.io/${{ github.repository }}-shell:${{ needs.validate-release.outputs.version }}`
+            - `ghcr.io/${{ github.repository }}-dashboard:${{ needs.validate-release.outputs.version }}`
+            - `ghcr.io/${{ github.repository }}-utenti:${{ needs.validate-release.outputs.version }}`
+            - `ghcr.io/${{ github.repository }}-report:${{ needs.validate-release.outputs.version }}`
+            
+            ## Quick Start
+            
+            ```bash
+            # Download and extract the release
+            wget https://github.com/${{ github.repository }}/releases/download/v${{ needs.validate-release.outputs.version }}/microshell-frontend-v${{ needs.validate-release.outputs.version }}.tar.gz
+            tar -xzf microshell-frontend-v${{ needs.validate-release.outputs.version }}.tar.gz
+            
+            # Start with Docker Compose
+            docker-compose up -d
+            ```
+            
+            ## Full Changelog
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ needs.validate-release.outputs.version }}...HEAD
+          files: |
+            release-artifacts/*
+          prerelease: ${{ needs.validate-release.outputs.is-prerelease }}
+          generate_release_notes: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  # ===== UPDATE PACKAGE VERSIONS =====
+  update-versions:
+    name: Update Package Versions
+    runs-on: ubuntu-latest
+    needs: [validate-release, create-release]
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Update package.json version
+        run: |
+          npm version ${{ needs.validate-release.outputs.version }} --no-git-tag-version
+          
+      - name: Update library versions
+        run: |
+          find libs -name "package.json" -exec npm version ${{ needs.validate-release.outputs.version }} --no-git-tag-version --prefix {} \;
+
+      - name: Commit version updates
+        run: |
+          git add package.json libs/*/package.json
+          git commit -m "chore: bump version to ${{ needs.validate-release.outputs.version }}"
+          git push
+
+      - name: Create and push tag
+        run: |
+          git tag v${{ needs.validate-release.outputs.version }}
+          git push origin v${{ needs.validate-release.outputs.version }}
+
+  # ===== DEPLOY TO PRODUCTION =====
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [validate-release, create-release]
+    if: needs.validate-release.outputs.is-prerelease == 'false'
+    environment:
+      name: production
+      url: https://microshell.com
+    steps:
+      - name: Deploy to production
+        run: |
+          echo "Deploying MicroShell v${{ needs.validate-release.outputs.version }} to production..."
+          # Add your production deployment logic here
+          # This could include:
+          # - Updating Kubernetes manifests
+          # - Rolling out to production cluster
+          # - Running smoke tests
+          # - Updating CDN configurations
+
+  # ===== NOTIFY =====
+  notify:
+    name: Notify Release
+    runs-on: ubuntu-latest
+    needs: [validate-release, create-release, deploy-production]
+    if: always()
+    steps:
+      - name: Notify Slack
+        if: success()
+        run: |
+          echo "✅ MicroShell v${{ needs.validate-release.outputs.version }} has been successfully released!"
+          # Add Slack notification logic here
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Release of MicroShell v${{ needs.validate-release.outputs.version }} failed!"
+          # Add failure notification logic here 

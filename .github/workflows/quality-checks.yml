@@ -1,0 +1,299 @@
+name: Quality Checks
+
+on:
+  schedule:
+    # Run every night at 2 AM UTC
+    - cron: '0 2 * * *'
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # ===== DEPENDENCY AUDIT =====
+  dependency-audit:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit npm dependencies
+        run: npm audit --audit-level=high
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Audit Python dependencies
+        working-directory: ./backend
+        run: |
+          pip install safety
+          pip install -r requirements.txt
+          safety check
+
+  # ===== CODE QUALITY =====
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint with detailed reporting
+        run: |
+          npx nx run-many --target=lint --all --format=json --output-file=eslint-report.json
+          npx nx run-many --target=lint --all --format=html --output-file=eslint-report.html
+
+      - name: Upload ESLint reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: eslint-reports
+          path: |
+            eslint-report.json
+            eslint-report.html
+
+  # ===== PERFORMANCE TESTS =====
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start services for performance testing
+        run: |
+          docker-compose up -d postgres redis
+          sleep 10
+
+      - name: Setup Python and start backend
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Start backend
+        working-directory: ./backend
+        run: |
+          pip install -r requirements.txt
+          python init_db.py
+          uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+          sleep 5
+
+      - name: Build frontend applications
+        run: |
+          npx nx build shell --configuration=production
+          npx nx build dashboard --configuration=production
+          npx nx build utenti --configuration=production
+          npx nx build report --configuration=production
+
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli@0.12.x
+
+      - name: Run Lighthouse CI
+        run: |
+          lhci autorun --upload.target=temporary-public-storage
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Load testing with Artillery
+        run: |
+          npm install -g artillery
+          artillery quick --count 50 --num 10 http://localhost:8000/health
+          artillery quick --count 30 --num 5 http://localhost:8000/api/dashboard/metrics
+
+      - name: Stop services
+        if: always()
+        run: docker-compose down
+
+  # ===== SECURITY SCANS =====
+  security-deep-scan:
+    name: Deep Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+
+      - name: Run CodeQL Analysis
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript, python
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+      - name: OWASP ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.10.0
+        with:
+          target: 'http://localhost:8000'
+
+  # ===== BUNDLE ANALYSIS =====
+  bundle-analysis:
+    name: Bundle Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build with bundle analysis
+        run: |
+          npx nx build shell --configuration=production --stats-json
+          npx nx build dashboard --configuration=production --stats-json
+          npx nx build utenti --configuration=production --stats-json
+          npx nx build report --configuration=production --stats-json
+
+      - name: Analyze bundle size
+        run: |
+          npx webpack-bundle-analyzer dist/apps/shell/stats.json --mode=json > shell-bundle-report.json
+          npx webpack-bundle-analyzer dist/apps/dashboard/stats.json --mode=json > dashboard-bundle-report.json
+          npx webpack-bundle-analyzer dist/apps/utenti/stats.json --mode=json > utenti-bundle-report.json
+          npx webpack-bundle-analyzer dist/apps/report/stats.json --mode=json > report-bundle-report.json
+
+      - name: Upload bundle analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-analysis
+          path: |
+            *-bundle-report.json
+            dist/apps/*/stats.json
+
+  # ===== ACCESSIBILITY TESTS =====
+  accessibility-tests:
+    name: Accessibility Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build applications
+        run: |
+          npx nx build shell --configuration=production
+          npx nx build dashboard --configuration=production
+          npx nx build utenti --configuration=production
+          npx nx build report --configuration=production
+
+      - name: Start applications for accessibility testing
+        run: |
+          npx nx serve shell --port=4200 &
+          npx nx serve dashboard --port=4201 &
+          npx nx serve utenti --port=4202 &
+          npx nx serve report --port=4203 &
+          sleep 30
+
+      - name: Run accessibility tests
+        run: |
+          npm install -g @axe-core/cli
+          axe http://localhost:4200 --reporter=json --output=shell-a11y-report.json
+          axe http://localhost:4201 --reporter=json --output=dashboard-a11y-report.json
+          axe http://localhost:4202 --reporter=json --output=utenti-a11y-report.json
+          axe http://localhost:4203 --reporter=json --output=report-a11y-report.json
+
+      - name: Upload accessibility reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-reports
+          path: |
+            *-a11y-report.json
+
+  # ===== SUMMARY REPORT =====
+  quality-summary:
+    name: Quality Summary
+    runs-on: ubuntu-latest
+    needs: [dependency-audit, code-quality, performance-tests, security-deep-scan, bundle-analysis, accessibility-tests]
+    if: always()
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Generate quality summary
+        run: |
+          echo "# Quality Check Summary" > quality-summary.md
+          echo "" >> quality-summary.md
+          echo "## Test Results" >> quality-summary.md
+          echo "- Dependency Audit: ${{ needs.dependency-audit.result }}" >> quality-summary.md
+          echo "- Code Quality: ${{ needs.code-quality.result }}" >> quality-summary.md
+          echo "- Performance Tests: ${{ needs.performance-tests.result }}" >> quality-summary.md
+          echo "- Security Scan: ${{ needs.security-deep-scan.result }}" >> quality-summary.md
+          echo "- Bundle Analysis: ${{ needs.bundle-analysis.result }}" >> quality-summary.md
+          echo "- Accessibility Tests: ${{ needs.accessibility-tests.result }}" >> quality-summary.md
+
+      - name: Comment PR with summary
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('quality-summary.md', 'utf8');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            }); 
