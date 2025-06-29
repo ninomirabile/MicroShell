@@ -1,0 +1,141 @@
+# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+
+# ===== AI & PROMPTS =====
+# Keep AI prompts and configurations private
+ai/
+@ai/
+
+# ===== NODE.JS / ANGULAR =====
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Build outputs
+dist/
+tmp/
+out-tsc/
+.angular/
+
+# ===== NX WORKSPACE =====
+.nx/cache
+.nx/workspace-data
+
+# ===== TESTING & COVERAGE =====
+/coverage
+/.sass-cache
+/connect.lock
+/libpeerconnection.log
+testem.log
+/typings
+.pytest_cache/
+htmlcov/
+.coverage
+
+# ===== IDEs AND EDITORS =====
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Cursor AI
+.cursor/rules/nx-rules.mdc
+
+# ===== SYSTEM FILES =====
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ===== PYTHON BACKEND =====
+backend/__pycache__/
+backend/*.py[cod]
+backend/*$py.class
+backend/.pytest_cache/
+backend/.coverage
+backend/htmlcov/
+backend/venv/
+backend/env/
+backend/logs/
+backend/*.log
+backend/*.db
+backend/*.sqlite3
+backend/*.sqlite
+
+# Python Virtual Environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ===== ENVIRONMENT & SECRETS =====
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.key
+*.crt
+
+# ===== DOCKER & INFRASTRUCTURE =====
+# Docker volumes data (but keep compose files)
+postgres_data/
+redis_data/
+prometheus_data/
+grafana_data/
+
+# Logs
+logs/
+*.log
+
+# ===== MONITORING & METRICS =====
+monitoring/data/
+monitoring/*.log
+
+# ===== BUILD ARTIFACTS =====
+*.tgz
+*.tar.gz
+
+# ===== EXPLICITLY PRESERVE IMPORTANT FILES =====
+# CI/CD and Configuration files
+!.github/
+!.github/workflows/
+!requirements.txt
+!backend/requirements.txt
+!package.json
+!package-lock.json
+!Dockerfile
+!docker-compose*.yml
+!nx.json
+!tsconfig*.json
+!jest.config.*
+!eslint.config.*
+!.prettierrc
+!.prettierignore
+!.editorconfig
+
+# Documentation
+!README.md
+!CHANGELOG.md
+!LICENSE
+
+# Important scripts
+!start.sh
+!*.sh
