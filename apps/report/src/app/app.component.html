@@ -1,0 +1,368 @@
+<div class="reports-container">
+  <div class="reports-header">
+    <h1>Reports</h1>
+    <p>Generate and manage system reports</p>
+  </div>
+
+  <!-- Loading State -->
+  <lib-loading *ngIf="isLoading" [message]="'Loading reports...'"></lib-loading>
+
+  <!-- Reports Content -->
+  <div *ngIf="!isLoading" class="reports-content">
+    
+    <!-- Summary Cards -->
+    <div class="summary-section">
+      <div class="summary-grid">
+        <lib-card 
+          title="Total Reports" 
+          [elevated]="true"
+          class="summary-card">
+          <div class="summary-content">
+            <div class="summary-value">{{ reportSummary?.total_reports || 0 }}</div>
+            <div class="summary-label">All Time</div>
+          </div>
+        </lib-card>
+        
+        <lib-card 
+          title="This Month" 
+          [elevated]="true"
+          class="summary-card">
+          <div class="summary-content">
+            <div class="summary-value">{{ reportSummary?.reports_this_month || 0 }}</div>
+            <div class="summary-label">Generated</div>
+          </div>
+        </lib-card>
+        
+        <lib-card 
+          title="Most Common" 
+          [elevated]="true"
+          class="summary-card">
+          <div class="summary-content">
+            <div class="summary-value">{{ reportSummary?.most_common_type || 'N/A' }}</div>
+            <div class="summary-label">Report Type</div>
+          </div>
+        </lib-card>
+        
+        <lib-card 
+          title="Avg Generation Time" 
+          [elevated]="true"
+          class="summary-card">
+          <div class="summary-content">
+            <div class="summary-value">{{ formatTime(reportSummary?.avg_generation_time) }}</div>
+            <div class="summary-label">Seconds</div>
+          </div>
+        </lib-card>
+      </div>
+    </div>
+
+    <!-- Generate Report Section -->
+    <div class="generate-section">
+      <lib-card title="Generate New Report" [elevated]="true">
+        <form [formGroup]="reportForm" (ngSubmit)="generateReport()">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="title">Report Title *</label>
+              <input 
+                id="title"
+                type="text" 
+                formControlName="title"
+                class="form-control"
+                placeholder="Enter report title"
+                [class.error]="reportForm.get('title')?.invalid && reportForm.get('title')?.touched">
+              <div *ngIf="reportForm.get('title')?.invalid && reportForm.get('title')?.touched" class="error-message">
+                Report title is required
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="type">Report Type *</label>
+              <select 
+                id="type"
+                formControlName="type"
+                class="form-control"
+                [class.error]="reportForm.get('type')?.invalid && reportForm.get('type')?.touched">
+                <option value="">Select report type</option>
+                <option value="user_activity">User Activity</option>
+                <option value="system_performance">System Performance</option>
+                <option value="audit_log">Audit Log</option>
+                <option value="custom">Custom Report</option>
+              </select>
+              <div *ngIf="reportForm.get('type')?.invalid && reportForm.get('type')?.touched" class="error-message">
+                Report type is required
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="format">Export Format *</label>
+              <select 
+                id="format"
+                formControlName="format"
+                class="form-control"
+                [class.error]="reportForm.get('format')?.invalid && reportForm.get('format')?.touched">
+                <option value="">Select format</option>
+                <option value="csv">CSV</option>
+                <option value="json">JSON</option>
+                <option value="pdf">PDF</option>
+                <option value="xlsx">Excel</option>
+              </select>
+              <div *ngIf="reportForm.get('format')?.invalid && reportForm.get('format')?.touched" class="error-message">
+                Export format is required
+              </div>
+            </div>
+          </div>
+          
+          <!-- Date Range -->
+          <div class="date-range-section">
+            <h4>Date Range (Optional)</h4>
+            <div class="date-grid">
+              <div class="form-group">
+                <label for="startDate">Start Date</label>
+                <input 
+                  id="startDate"
+                  type="date" 
+                  formControlName="start_date"
+                  class="form-control">
+              </div>
+              
+              <div class="form-group">
+                <label for="endDate">End Date</label>
+                <input 
+                  id="endDate"
+                  type="date" 
+                  formControlName="end_date"
+                  class="form-control">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Additional Parameters -->
+          <div class="parameters-section" *ngIf="reportForm.get('type')?.value">
+            <h4>Additional Parameters</h4>
+            <div class="parameters-grid">
+              <div class="form-group" *ngIf="reportForm.get('type')?.value === 'user_activity'">
+                <label>
+                  <input type="checkbox" formControlName="include_inactive">
+                  Include Inactive Users
+                </label>
+              </div>
+              
+              <div class="form-group" *ngIf="reportForm.get('type')?.value === 'system_performance'">
+                <label>
+                  <input type="checkbox" formControlName="detailed_metrics">
+                  Include Detailed Metrics
+                </label>
+              </div>
+              
+              <div class="form-group" *ngIf="reportForm.get('type')?.value === 'audit_log'">
+                <label for="logLevel">Log Level</label>
+                <select id="logLevel" formControlName="log_level" class="form-control">
+                  <option value="">All Levels</option>
+                  <option value="INFO">Info</option>
+                  <option value="WARNING">Warning</option>
+                  <option value="ERROR">Error</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <lib-button 
+              type="submit"
+              variant="primary"
+              [loading]="isGenerating"
+              [disabled]="reportForm.invalid">
+              Generate Report
+            </lib-button>
+            
+            <lib-button 
+              type="button"
+              variant="secondary"
+              (clicked)="resetForm()">
+              Reset
+            </lib-button>
+          </div>
+        </form>
+      </lib-card>
+    </div>
+
+    <!-- Reports List -->
+    <div class="reports-list-section">
+      <lib-card title="Recent Reports" [elevated]="true">
+        <div class="reports-actions">
+          <lib-button 
+            variant="info"
+            size="small"
+            (clicked)="refreshReports()">
+            Refresh
+          </lib-button>
+          
+          <lib-button 
+            variant="warning"
+            size="small"
+            (clicked)="getSystemHealthReport()">
+            System Health Report
+          </lib-button>
+        </div>
+        
+        <div class="reports-table-container">
+          <table class="reports-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Size</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let report of reports" [class]="'status-' + report.status">
+                <td>{{ report.title }}</td>
+                <td>
+                  <span class="type-badge" [class]="'type-' + report.type">
+                    {{ formatReportType(report.type) }}
+                  </span>
+                </td>
+                <td>
+                  <span class="status-badge" [class]="'status-' + report.status">
+                    {{ report.status | titlecase }}
+                  </span>
+                </td>
+                <td>{{ formatDate(report.created_at) }}</td>
+                <td>{{ formatFileSize(report.size) }}</td>
+                <td>
+                  <div class="action-buttons">
+                    <lib-button 
+                      variant="info" 
+                      size="small"
+                      (clicked)="viewReport(report)"
+                      [disabled]="report.status !== 'completed'">
+                      View
+                    </lib-button>
+                    
+                    <lib-button 
+                      variant="success" 
+                      size="small"
+                      (clicked)="downloadReport(report)"
+                      [disabled]="report.status !== 'completed'">
+                      Download
+                    </lib-button>
+                    
+                    <lib-button 
+                      variant="danger" 
+                      size="small"
+                      (clicked)="deleteReport(report)">
+                      Delete
+                    </lib-button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <!-- Empty State -->
+          <div *ngIf="reports.length === 0" class="empty-state">
+            <p>No reports generated yet</p>
+            <p class="empty-subtitle">Generate your first report using the form above</p>
+          </div>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="pagination" *ngIf="totalPages > 1">
+          <lib-button 
+            variant="secondary" 
+            size="small"
+            [disabled]="currentPage === 1"
+            (clicked)="previousPage()">
+            Previous
+          </lib-button>
+          
+          <span class="page-info">
+            Page {{ currentPage }} of {{ totalPages }} ({{ totalReports }} total)
+          </span>
+          
+          <lib-button 
+            variant="secondary" 
+            size="small"
+            [disabled]="currentPage === totalPages"
+            (clicked)="nextPage()">
+            Next
+          </lib-button>
+        </div>
+      </lib-card>
+    </div>
+  </div>
+
+  <!-- Report Details Modal -->
+  <div *ngIf="showReportModal" class="modal-backdrop" (click)="closeReportModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Report Details</h3>
+        <button class="modal-close" (click)="closeReportModal()">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="report-details" *ngIf="selectedReport">
+          <div class="detail-group">
+            <label>Title:</label>
+            <span>{{ selectedReport.title }}</span>
+          </div>
+          <div class="detail-group">
+            <label>Type:</label>
+            <span class="type-badge" [class]="'type-' + selectedReport.type">
+              {{ formatReportType(selectedReport.type) }}
+            </span>
+          </div>
+          <div class="detail-group">
+            <label>Status:</label>
+            <span class="status-badge" [class]="'status-' + selectedReport.status">
+              {{ selectedReport.status | titlecase }}
+            </span>
+          </div>
+          <div class="detail-group">
+            <label>Created:</label>
+            <span>{{ formatDate(selectedReport.created_at) }}</span>
+          </div>
+          <div class="detail-group" *ngIf="selectedReport.generated_at">
+            <label>Generated:</label>
+            <span>{{ formatDate(selectedReport.generated_at) }}</span>
+          </div>
+          <div class="detail-group" *ngIf="selectedReport.size">
+            <label>File Size:</label>
+            <span>{{ formatFileSize(selectedReport.size) }}</span>
+          </div>
+          <div class="detail-group" *ngIf="selectedReport.parameters">
+            <label>Parameters:</label>
+            <pre class="parameters-json">{{ selectedReport.parameters | json }}</pre>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <lib-button 
+          variant="secondary"
+          (clicked)="closeReportModal()">
+          Close
+        </lib-button>
+        
+        <lib-button 
+          variant="success"
+          (clicked)="downloadReport(selectedReport!)"
+          [disabled]="selectedReport?.status !== 'completed'">
+          Download
+        </lib-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <lib-card title="Error Loading Reports">
+      <p>{{ error }}</p>
+      <lib-button variant="primary" (clicked)="loadReports()">
+        Retry
+      </lib-button>
+    </lib-card>
+  </div>
+</div>
