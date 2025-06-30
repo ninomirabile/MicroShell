@@ -14,15 +14,14 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [
-    UtentiComponent
-  ],
+  declarations: [],
   imports: [
     CommonModule,
-    FormsModule,
     ReactiveFormsModule,
+    FormsModule,
     RouterModule.forChild(routes),
-    LoadingComponent
+    LoadingComponent,
+    UtentiComponent
   ]
 })
 export class UtentiModule { } 

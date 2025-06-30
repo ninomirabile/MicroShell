@@ -14,15 +14,14 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [
-    ReportComponent
-  ],
+  declarations: [],
   imports: [
     CommonModule,
-    FormsModule,
     ReactiveFormsModule,
+    FormsModule,
     RouterModule.forChild(routes),
-    LoadingComponent
+    LoadingComponent,
+    ReportComponent
   ]
 })
 export class ReportModule { } 

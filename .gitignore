@@ -139,3 +139,4 @@ monitoring/*.log
 # Important scripts
 !start.sh
 !*.sh
+.github/instructions/nx.instructions.md

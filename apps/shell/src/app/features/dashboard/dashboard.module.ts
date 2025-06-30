@@ -14,14 +14,13 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [
-    DashboardComponent
-  ],
+  declarations: [],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     RouterModule.forChild(routes),
-    LoadingComponent
+    LoadingComponent,
+    DashboardComponent
   ]
 })
 export class DashboardModule { } 

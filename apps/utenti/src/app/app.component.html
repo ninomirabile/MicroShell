@@ -5,287 +5,306 @@
   </div>
 
   <!-- Loading State -->
-  <lib-loading *ngIf="isLoading" [message]="'Loading users...'"></lib-loading>
+  @if (isLoading) {
+    <lib-loading [message]="'Loading users...'"></lib-loading>
+  }
 
   <!-- Users Content -->
-  <div *ngIf="!isLoading" class="users-content">
-    
-    <!-- Search and Actions Bar -->
-    <div class="actions-bar">
-      <div class="search-section">
-        <input 
-          type="text" 
-          [(ngModel)]="searchTerm" 
-          (input)="onSearch()"
-          placeholder="Search users..."
-          class="search-input">
-        <lib-button 
-          variant="secondary" 
-          size="small"
-          (clicked)="clearSearch()">
-          Clear
-        </lib-button>
-      </div>
-      
-      <div class="action-buttons">
-        <lib-button 
-          variant="primary"
-          (clicked)="openCreateUserModal()">
-          Add New User
-        </lib-button>
-        <lib-button 
-          variant="info"
-          (clicked)="refreshUsers()">
-          Refresh
-        </lib-button>
-      </div>
-    </div>
-
-    <!-- Users Table -->
-    <lib-card title="Users" [elevated]="true" class="users-table-card">
-      <div class="table-container">
-        <table class="users-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Username</th>
-              <th>Full Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Created</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let user of users" [class.inactive]="!user.is_active">
-              <td>{{ user.id }}</td>
-              <td>{{ user.username }}</td>
-              <td>{{ user.full_name }}</td>
-              <td>{{ user.email }}</td>
-              <td>
-                <span class="role-badge" [class]="'role-' + user.role.name.toLowerCase()">
-                  {{ user.role.name }}
-                </span>
-              </td>
-              <td>
-                <span class="status-badge" [class]="user.is_active ? 'active' : 'inactive'">
-                  {{ user.is_active ? 'Active' : 'Inactive' }}
-                </span>
-              </td>
-              <td>{{ formatDate(user.created_at) }}</td>
-              <td>
-                <div class="action-buttons">
-                  <lib-button 
-                    variant="info" 
-                    size="small"
-                    (clicked)="viewUser(user)">
-                    View
-                  </lib-button>
-                  <lib-button 
-                    variant="warning" 
-                    size="small"
-                    (clicked)="editUser(user)">
-                    Edit
-                  </lib-button>
-                  <lib-button 
-                    variant="danger" 
-                    size="small"
-                    (clicked)="deleteUser(user)"
-                    [disabled]="user.id === currentUserId">
-                    Delete
-                  </lib-button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        
-        <!-- Empty State -->
-        <div *ngIf="users.length === 0" class="empty-state">
-          <p>No users found</p>
-          <lib-button variant="primary" (clicked)="openCreateUserModal()">
-            Create First User
+  @if (!isLoading) {
+    <div class="users-content">
+      <!-- Search and Actions Bar -->
+      <div class="actions-bar">
+        <div class="search-section">
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (input)="onSearch()"
+            placeholder="Search users..."
+            class="search-input">
+          <lib-button
+            variant="secondary"
+            size="small"
+            (clicked)="clearSearch()">
+            Clear
+          </lib-button>
+        </div>
+        <div class="action-buttons">
+          <lib-button
+            variant="primary"
+            (clicked)="openCreateUserModal()">
+            Add New User
+          </lib-button>
+          <lib-button
+            variant="info"
+            (clicked)="refreshUsers()">
+            Refresh
           </lib-button>
         </div>
       </div>
-      
-      <!-- Pagination -->
-      <div class="pagination" *ngIf="totalPages > 1">
-        <lib-button 
-          variant="secondary" 
-          size="small"
-          [disabled]="currentPage === 1"
-          (clicked)="previousPage()">
-          Previous
-        </lib-button>
-        
-        <span class="page-info">
-          Page {{ currentPage }} of {{ totalPages }} ({{ totalUsers }} total)
-        </span>
-        
-        <lib-button 
-          variant="secondary" 
-          size="small"
-          [disabled]="currentPage === totalPages"
-          (clicked)="nextPage()">
-          Next
-        </lib-button>
-      </div>
-    </lib-card>
-  </div>
+      <!-- Users Table -->
+      <lib-card title="Users" [elevated]="true" class="users-table-card">
+        <div class="table-container">
+          <table class="users-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of users; track user) {
+                <tr [class.inactive]="!user.is_active">
+                  <td>{{ user.id }}</td>
+                  <td>{{ user.username }}</td>
+                  <td>{{ user.full_name }}</td>
+                  <td>{{ user.email }}</td>
+                  <td>
+                    <span class="role-badge" [class]="'role-' + user.role.name.toLowerCase()">
+                      {{ user.role.name }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="status-badge" [class]="user.is_active ? 'active' : 'inactive'">
+                      {{ user.is_active ? 'Active' : 'Inactive' }}
+                    </span>
+                  </td>
+                  <td>{{ formatDate(user.created_at) }}</td>
+                  <td>
+                    <div class="action-buttons">
+                      <lib-button
+                        variant="info"
+                        size="small"
+                        (clicked)="viewUser(user)">
+                        View
+                      </lib-button>
+                      <lib-button
+                        variant="warning"
+                        size="small"
+                        (clicked)="editUser(user)">
+                        Edit
+                      </lib-button>
+                      <lib-button
+                        variant="danger"
+                        size="small"
+                        (clicked)="deleteUser(user)"
+                        [disabled]="user.id === currentUserId">
+                        Delete
+                      </lib-button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          <!-- Empty State -->
+          @if (users.length === 0) {
+            <div class="empty-state">
+              <p>No users found</p>
+              <lib-button variant="primary" (clicked)="openCreateUserModal()">
+                Create First User
+              </lib-button>
+            </div>
+          }
+        </div>
+        <!-- Pagination -->
+        @if (totalPages > 1) {
+          <div class="pagination">
+            <lib-button
+              variant="secondary"
+              size="small"
+              [disabled]="currentPage === 1"
+              (clicked)="previousPage()">
+              Previous
+            </lib-button>
+            <span class="page-info">
+              Page {{ currentPage }} of {{ totalPages }} ({{ totalUsers }} total)
+            </span>
+            <lib-button
+              variant="secondary"
+              size="small"
+              [disabled]="currentPage === totalPages"
+              (clicked)="nextPage()">
+              Next
+            </lib-button>
+          </div>
+        }
+      </lib-card>
+    </div>
+  }
 
   <!-- User Modal -->
-  <div *ngIf="showModal" class="modal-backdrop" (click)="closeModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>{{ modalMode === 'create' ? 'Create New User' : modalMode === 'edit' ? 'Edit User' : 'User Details' }}</h3>
-        <button class="modal-close" (click)="closeModal()">&times;</button>
-      </div>
-      
-      <div class="modal-body">
-        <!-- View Mode -->
-        <div *ngIf="modalMode === 'view'" class="user-details">
-          <div class="detail-group">
-            <label>Username:</label>
-            <span>{{ selectedUser?.username }}</span>
-          </div>
-          <div class="detail-group">
-            <label>Full Name:</label>
-            <span>{{ selectedUser?.full_name }}</span>
-          </div>
-          <div class="detail-group">
-            <label>Email:</label>
-            <span>{{ selectedUser?.email }}</span>
-          </div>
-          <div class="detail-group">
-            <label>Role:</label>
-            <span class="role-badge" [class]="'role-' + selectedUser?.role?.name?.toLowerCase()">
-              {{ selectedUser?.role?.name }}
-            </span>
-          </div>
-          <div class="detail-group">
-            <label>Status:</label>
-            <span class="status-badge" [class]="selectedUser?.is_active ? 'active' : 'inactive'">
-              {{ selectedUser?.is_active ? 'Active' : 'Inactive' }}
-            </span>
-          </div>
-          <div class="detail-group">
-            <label>Created:</label>
-            <span>{{ formatDate(selectedUser?.created_at) }}</span>
-          </div>
-          <div class="detail-group">
-            <label>Last Updated:</label>
-            <span>{{ formatDate(selectedUser?.updated_at) }}</span>
-          </div>
+  @if (showModal) {
+    <div class="modal-backdrop" (click)="closeModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>{{ modalMode === 'create' ? 'Create New User' : modalMode === 'edit' ? 'Edit User' : 'User Details' }}</h3>
+          <button class="modal-close" (click)="closeModal()">&times;</button>
         </div>
-        
-        <!-- Create/Edit Form -->
-        <form *ngIf="modalMode !== 'view'" [formGroup]="userForm" (ngSubmit)="saveUser()">
-          <div class="form-group">
-            <label for="username">Username *</label>
-            <input 
-              id="username"
-              type="text" 
-              formControlName="username"
-              class="form-control"
-              [class.error]="userForm.get('username')?.invalid && userForm.get('username')?.touched">
-            <div *ngIf="userForm.get('username')?.invalid && userForm.get('username')?.touched" class="error-message">
-              Username is required
+        <div class="modal-body">
+          <!-- View Mode -->
+          @if (modalMode === 'view') {
+            <div class="user-details">
+              <div class="detail-group">
+                <label>Username:</label>
+                <span>{{ selectedUser?.username }}</span>
+              </div>
+              <div class="detail-group">
+                <label>Full Name:</label>
+                <span>{{ selectedUser?.full_name }}</span>
+              </div>
+              <div class="detail-group">
+                <label>Email:</label>
+                <span>{{ selectedUser?.email }}</span>
+              </div>
+              <div class="detail-group">
+                <label>Role:</label>
+                <span class="role-badge" [class]="'role-' + selectedUser?.role?.name?.toLowerCase()">
+                  {{ selectedUser?.role?.name }}
+                </span>
+              </div>
+              <div class="detail-group">
+                <label>Status:</label>
+                <span class="status-badge" [class]="selectedUser?.is_active ? 'active' : 'inactive'">
+                  {{ selectedUser?.is_active ? 'Active' : 'Inactive' }}
+                </span>
+              </div>
+              <div class="detail-group">
+                <label>Created:</label>
+                <span>{{ formatDate(selectedUser?.created_at) }}</span>
+              </div>
+              <div class="detail-group">
+                <label>Last Updated:</label>
+                <span>{{ formatDate(selectedUser?.updated_at) }}</span>
+              </div>
             </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="fullName">Full Name *</label>
-            <input 
-              id="fullName"
-              type="text" 
-              formControlName="full_name"
-              class="form-control"
-              [class.error]="userForm.get('full_name')?.invalid && userForm.get('full_name')?.touched">
-            <div *ngIf="userForm.get('full_name')?.invalid && userForm.get('full_name')?.touched" class="error-message">
-              Full name is required
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="email">Email *</label>
-            <input 
-              id="email"
-              type="email" 
-              formControlName="email"
-              class="form-control"
-              [class.error]="userForm.get('email')?.invalid && userForm.get('email')?.touched">
-            <div *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched" class="error-message">
-              Valid email is required
-            </div>
-          </div>
-          
-          <div class="form-group" *ngIf="modalMode === 'create'">
-            <label for="password">Password *</label>
-            <input 
-              id="password"
-              type="password" 
-              formControlName="password"
-              class="form-control"
-              [class.error]="userForm.get('password')?.invalid && userForm.get('password')?.touched">
-            <div *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched" class="error-message">
-              Password is required (minimum 6 characters)
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="role">Role *</label>
-            <select 
-              id="role"
-              formControlName="role_id"
-              class="form-control"
-              [class.error]="userForm.get('role_id')?.invalid && userForm.get('role_id')?.touched">
-              <option value="">Select a role</option>
-              <option *ngFor="let role of roles" [value]="role.id">{{ role.name }}</option>
-            </select>
-            <div *ngIf="userForm.get('role_id')?.invalid && userForm.get('role_id')?.touched" class="error-message">
-              Role is required
-            </div>
-          </div>
-          
-          <div class="form-group" *ngIf="modalMode === 'edit'">
-            <label class="checkbox-label">
-              <input 
-                type="checkbox" 
-                formControlName="is_active">
-              Active User
-            </label>
-          </div>
-        </form>
-      </div>
-      
-      <div class="modal-footer">
-        <lib-button 
-          variant="secondary"
-          (clicked)="closeModal()">
-          Cancel
-        </lib-button>
-        
-        <lib-button 
-          *ngIf="modalMode !== 'view'"
-          variant="primary"
-          [loading]="isSaving"
-          [disabled]="userForm.invalid"
-          (clicked)="saveUser()">
-          {{ modalMode === 'create' ? 'Create User' : 'Update User' }}
-        </lib-button>
+          }
+          <!-- Create/Edit Form -->
+          @if (modalMode !== 'view') {
+            <form [formGroup]="userForm" (ngSubmit)="saveUser()">
+              <div class="form-group">
+                <label for="username">Username *</label>
+                <input
+                  id="username"
+                  type="text"
+                  formControlName="username"
+                  class="form-control"
+                  [class.error]="userForm.get('username')?.invalid && userForm.get('username')?.touched">
+                @if (userForm.get('username')?.invalid && userForm.get('username')?.touched) {
+                  <div class="error-message">
+                    Username is required
+                  </div>
+                }
+              </div>
+              <div class="form-group">
+                <label for="fullName">Full Name *</label>
+                <input
+                  id="fullName"
+                  type="text"
+                  formControlName="full_name"
+                  class="form-control"
+                  [class.error]="userForm.get('full_name')?.invalid && userForm.get('full_name')?.touched">
+                @if (userForm.get('full_name')?.invalid && userForm.get('full_name')?.touched) {
+                  <div class="error-message">
+                    Full name is required
+                  </div>
+                }
+              </div>
+              <div class="form-group">
+                <label for="email">Email *</label>
+                <input
+                  id="email"
+                  type="email"
+                  formControlName="email"
+                  class="form-control"
+                  [class.error]="userForm.get('email')?.invalid && userForm.get('email')?.touched">
+                @if (userForm.get('email')?.invalid && userForm.get('email')?.touched) {
+                  <div class="error-message">
+                    Valid email is required
+                  </div>
+                }
+              </div>
+              @if (modalMode === 'create') {
+                <div class="form-group">
+                  <label for="password">Password *</label>
+                  <input
+                    id="password"
+                    type="password"
+                    formControlName="password"
+                    class="form-control"
+                    [class.error]="userForm.get('password')?.invalid && userForm.get('password')?.touched">
+                  @if (userForm.get('password')?.invalid && userForm.get('password')?.touched) {
+                    <div class="error-message">
+                      Password is required (minimum 6 characters)
+                    </div>
+                  }
+                </div>
+              }
+              <div class="form-group">
+                <label for="role">Role *</label>
+                <select
+                  id="role"
+                  formControlName="role_id"
+                  class="form-control"
+                  [class.error]="userForm.get('role_id')?.invalid && userForm.get('role_id')?.touched">
+                  <option value="">Select a role</option>
+                  @for (role of roles; track role) {
+                    <option [value]="role.id">{{ role.name }}</option>
+                  }
+                </select>
+                @if (userForm.get('role_id')?.invalid && userForm.get('role_id')?.touched) {
+                  <div class="error-message">
+                    Role is required
+                  </div>
+                }
+              </div>
+              @if (modalMode === 'edit') {
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input
+                      type="checkbox"
+                      formControlName="is_active">
+                    Active User
+                  </label>
+                </div>
+              }
+            </form>
+          }
+        </div>
+        <div class="modal-footer">
+          <lib-button
+            variant="secondary"
+            (clicked)="closeModal()">
+            Cancel
+          </lib-button>
+          @if (modalMode !== 'view') {
+            <lib-button
+              variant="primary"
+              [loading]="isSaving"
+              [disabled]="userForm.invalid"
+              (clicked)="saveUser()">
+              {{ modalMode === 'create' ? 'Create User' : 'Update User' }}
+            </lib-button>
+          }
+        </div>
       </div>
     </div>
-  </div>
+  }
 
   <!-- Error State -->
-  <div *ngIf="error" class="error-container">
-    <lib-card title="Error Loading Users">
-      <p>{{ error }}</p>
-      <lib-button variant="primary" (clicked)="loadUsers()">
-        Retry
-      </lib-button>
-    </lib-card>
-  </div>
+  @if (error) {
+    <div class="error-container">
+      <lib-card title="Error Loading Users">
+        <p>{{ error }}</p>
+        <lib-button variant="primary" (clicked)="loadUsers()">
+          Retry
+        </lib-button>
+      </lib-card>
+    </div>
+  }
 </div>

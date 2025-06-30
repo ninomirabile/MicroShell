@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { LoadingComponent } from '@microshell/ui';
 import { ApiService } from '@microshell/services';
 
 interface User {
@@ -14,62 +16,66 @@ interface User {
 
 @Component({
   selector: 'app-utenti',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, LoadingComponent],
   template: `
     <div class="utenti-container">
       <h1>👥 Gestione Utenti</h1>
-      
+    
       <div class="actions-bar">
         <button class="btn btn-primary" (click)="showAddUserForm = !showAddUserForm">
           ➕ Aggiungi Utente
         </button>
         <div class="search-box">
-          <input 
-            type="text" 
-            placeholder="Cerca utenti..." 
+          <input
+            type="text"
+            placeholder="Cerca utenti..."
             [(ngModel)]="searchTerm"
             (input)="filterUsers()"
             class="search-input">
         </div>
       </div>
-      
-      <div class="add-user-form" *ngIf="showAddUserForm">
-        <h3>Nuovo Utente</h3>
-        <form [formGroup]="userForm" (ngSubmit)="addUser()">
-          <div class="form-row">
-            <div class="form-group">
-              <label>Email</label>
-              <input type="email" formControlName="email" class="form-control">
+    
+      @if (showAddUserForm) {
+        <div class="add-user-form">
+          <h3>Nuovo Utente</h3>
+          <form [formGroup]="userForm" (ngSubmit)="addUser()">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" formControlName="email" class="form-control">
+              </div>
+              <div class="form-group">
+                <label>Username</label>
+                <input type="text" formControlName="username" class="form-control">
+              </div>
             </div>
-            <div class="form-group">
-              <label>Username</label>
-              <input type="text" formControlName="username" class="form-control">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nome Completo</label>
+                <input type="text" formControlName="fullName" class="form-control">
+              </div>
+              <div class="form-group">
+                <label>Ruolo</label>
+                <select formControlName="role" class="form-control">
+                  <option value="user">Utente</option>
+                  <option value="admin">Amministratore</option>
+                  <option value="manager">Manager</option>
+                </select>
+              </div>
             </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Nome Completo</label>
-              <input type="text" formControlName="fullName" class="form-control">
+            <div class="form-actions">
+              <button type="submit" class="btn btn-success" [disabled]="userForm.invalid">
+                Salva
+              </button>
+              <button type="button" class="btn btn-secondary" (click)="showAddUserForm = false">
+                Annulla
+              </button>
             </div>
-            <div class="form-group">
-              <label>Ruolo</label>
-              <select formControlName="role" class="form-control">
-                <option value="user">Utente</option>
-                <option value="admin">Amministratore</option>
-                <option value="manager">Manager</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-actions">
-            <button type="submit" class="btn btn-success" [disabled]="userForm.invalid">
-              Salva
-            </button>
-            <button type="button" class="btn btn-secondary" (click)="showAddUserForm = false">
-              Annulla
-            </button>
-          </div>
-        </form>
-      </div>
-      
+          </form>
+        </div>
+      }
+    
       <div class="users-table">
         <table>
           <thead>
@@ -84,37 +90,41 @@ interface User {
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let user of filteredUsers">
-              <td>{{ user.email }}</td>
-              <td>{{ user.username }}</td>
-              <td>{{ user.fullName }}</td>
-              <td>
-                <span class="role-badge" [class]="'role-' + user.role">
-                  {{ getRoleLabel(user.role) }}
-                </span>
-              </td>
-              <td>
-                <span class="status-badge" [class]="user.isActive ? 'status-active' : 'status-inactive'">
-                  {{ user.isActive ? 'Attivo' : 'Inattivo' }}
-                </span>
-              </td>
-              <td>{{ user.lastLogin | date:'medium' || 'Mai' }}</td>
-              <td>
-                <button class="btn btn-sm btn-warning" (click)="editUser(user)">
-                  ✏️
-                </button>
-                <button class="btn btn-sm btn-danger" (click)="deleteUser(user.id)">
-                  🗑️
-                </button>
-              </td>
-            </tr>
+            @for (user of filteredUsers; track user) {
+              <tr>
+                <td>{{ user.email }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.fullName }}</td>
+                <td>
+                  <span class="role-badge" [class]="'role-' + user.role">
+                    {{ getRoleLabel(user.role) }}
+                  </span>
+                </td>
+                <td>
+                  <span class="status-badge" [class]="user.isActive ? 'status-active' : 'status-inactive'">
+                    {{ user.isActive ? 'Attivo' : 'Inattivo' }}
+                  </span>
+                </td>
+                <td>{{ user.lastLogin ? (user.lastLogin | date:'medium') : 'Mai' }}</td>
+                <td>
+                  <button class="btn btn-sm btn-warning" (click)="editUser(user)">
+                    ✏️
+                  </button>
+                  <button class="btn btn-sm btn-danger" (click)="deleteUser(user.id)">
+                    🗑️
+                  </button>
+                </td>
+              </tr>
+            }
           </tbody>
         </table>
       </div>
-      
-      <lib-loading *ngIf="loading" message="Caricamento utenti..."></lib-loading>
+    
+      @if (loading) {
+        <lib-loading message="Caricamento utenti..."></lib-loading>
+      }
     </div>
-  `,
+    `,
   styles: [`
     .utenti-container {
       padding: 20px;

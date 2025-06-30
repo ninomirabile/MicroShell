@@ -1,18 +1,20 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'lib-loading',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div class="loading-container" [class.overlay]="overlay">
       <div class="loading-spinner">
         <div class="spinner"></div>
-        <p *ngIf="message" class="loading-message">{{ message }}</p>
+        @if (message) {
+          <p class="loading-message">{{ message }}</p>
+        }
       </div>
     </div>
-  `,
+    `,
   styles: [`
     .loading-container {
       display: flex;

@@ -5,139 +5,138 @@
   </div>
 
   <!-- Loading State -->
-  <lib-loading *ngIf="isLoading" [message]="'Loading dashboard data...'"></lib-loading>
+  @if (isLoading) {
+    <lib-loading [message]="'Loading dashboard data...'"></lib-loading>
+  }
 
   <!-- Dashboard Content -->
-  <div *ngIf="!isLoading" class="dashboard-content">
-    
-    <!-- Metrics Cards -->
-    <div class="metrics-grid">
-      <lib-card 
-        *ngFor="let metric of metricsCards" 
-        [title]="metric.title"
-        [elevated]="true"
-        class="metric-card">
-        <div class="metric-content">
-          <div class="metric-value">{{ metric.value }}</div>
-          <div class="metric-change" [class]="metric.changeClass">
-            {{ metric.change }}
+  @if (!isLoading) {
+    <div class="dashboard-content">
+      <!-- Metrics Cards -->
+      <div class="metrics-grid">
+        @for (metric of metricsCards; track metric) {
+          <lib-card
+            [title]="metric.title"
+            [elevated]="true"
+            class="metric-card">
+            <div class="metric-content">
+              <div class="metric-value">{{ metric.value }}</div>
+              <div class="metric-change" [class]="metric.changeClass">
+                {{ metric.change }}
+              </div>
+            </div>
+          </lib-card>
+        }
+      </div>
+      <!-- Charts Section -->
+      <div class="charts-section">
+        <div class="charts-header">
+          <h2>Analytics</h2>
+          <div class="chart-controls">
+            <select [(ngModel)]="selectedPeriod" (change)="onPeriodChange()" class="period-select">
+              <option value="7d">Last 7 days</option>
+              <option value="30d">Last 30 days</option>
+              <option value="90d">Last 90 days</option>
+            </select>
+            <lib-button
+              variant="secondary"
+              size="small"
+              (clicked)="refreshData()">
+              Refresh
+            </lib-button>
           </div>
         </div>
-      </lib-card>
-    </div>
-
-    <!-- Charts Section -->
-    <div class="charts-section">
-      <div class="charts-header">
-        <h2>Analytics</h2>
-        <div class="chart-controls">
-          <select [(ngModel)]="selectedPeriod" (change)="onPeriodChange()" class="period-select">
-            <option value="7d">Last 7 days</option>
-            <option value="30d">Last 30 days</option>
-            <option value="90d">Last 90 days</option>
-          </select>
-          <lib-button 
-            variant="secondary" 
-            size="small"
-            (clicked)="refreshData()">
-            Refresh
+        <div class="charts-grid">
+          <!-- User Registrations Chart -->
+          <lib-card title="User Registrations" class="chart-card">
+            <div class="chart-container">
+              <canvas #userRegistrationsChart></canvas>
+            </div>
+          </lib-card>
+          <!-- Session Activity Chart -->
+          <lib-card title="Session Activity" class="chart-card">
+            <div class="chart-container">
+              <canvas #sessionActivityChart></canvas>
+            </div>
+          </lib-card>
+          <!-- Feature Usage Chart -->
+          <lib-card title="Feature Usage" class="chart-card">
+            <div class="chart-container">
+              <canvas #featureUsageChart></canvas>
+            </div>
+          </lib-card>
+          <!-- Performance Metrics Chart -->
+          <lib-card title="Performance Metrics" class="chart-card">
+            <div class="chart-container">
+              <canvas #performanceChart></canvas>
+            </div>
+          </lib-card>
+        </div>
+      </div>
+      <!-- System Health Section -->
+      <div class="system-health-section">
+        <lib-card title="System Health" [elevated]="true">
+          <div class="health-grid">
+            <div class="health-item">
+              <div class="health-label">Status</div>
+              <div class="health-value" [class]="'status-' + systemHealth?.status">
+                {{ systemHealth?.status | titlecase }}
+              </div>
+            </div>
+            <div class="health-item">
+              <div class="health-label">Uptime</div>
+              <div class="health-value">{{ formatUptime(systemHealth?.uptime) }}</div>
+            </div>
+            <div class="health-item">
+              <div class="health-label">Memory Usage</div>
+              <div class="health-value">{{ systemHealth?.memory_usage }}%</div>
+            </div>
+            <div class="health-item">
+              <div class="health-label">CPU Usage</div>
+              <div class="health-value">{{ systemHealth?.cpu_usage }}%</div>
+            </div>
+            <div class="health-item">
+              <div class="health-label">Database</div>
+              <div class="health-value" [class]="'db-' + systemHealth?.database_status">
+                {{ systemHealth?.database_status | titlecase }}
+              </div>
+            </div>
+          </div>
+        </lib-card>
+      </div>
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <h3>Quick Actions</h3>
+        <div class="actions-grid">
+          <lib-button
+            variant="primary"
+            (clicked)="seedData()">
+            Seed Sample Data
+          </lib-button>
+          <lib-button
+            variant="info"
+            (clicked)="exportData()">
+            Export Analytics
+          </lib-button>
+          <lib-button
+            variant="warning"
+            (clicked)="clearCache()">
+            Clear Cache
           </lib-button>
         </div>
       </div>
-
-      <div class="charts-grid">
-        <!-- User Registrations Chart -->
-        <lib-card title="User Registrations" class="chart-card">
-          <div class="chart-container">
-            <canvas #userRegistrationsChart></canvas>
-          </div>
-        </lib-card>
-
-        <!-- Session Activity Chart -->
-        <lib-card title="Session Activity" class="chart-card">
-          <div class="chart-container">
-            <canvas #sessionActivityChart></canvas>
-          </div>
-        </lib-card>
-
-        <!-- Feature Usage Chart -->
-        <lib-card title="Feature Usage" class="chart-card">
-          <div class="chart-container">
-            <canvas #featureUsageChart></canvas>
-          </div>
-        </lib-card>
-
-        <!-- Performance Metrics Chart -->
-        <lib-card title="Performance Metrics" class="chart-card">
-          <div class="chart-container">
-            <canvas #performanceChart></canvas>
-          </div>
-        </lib-card>
-      </div>
     </div>
-
-    <!-- System Health Section -->
-    <div class="system-health-section">
-      <lib-card title="System Health" [elevated]="true">
-        <div class="health-grid">
-          <div class="health-item">
-            <div class="health-label">Status</div>
-            <div class="health-value" [class]="'status-' + systemHealth?.status">
-              {{ systemHealth?.status | titlecase }}
-            </div>
-          </div>
-          <div class="health-item">
-            <div class="health-label">Uptime</div>
-            <div class="health-value">{{ formatUptime(systemHealth?.uptime) }}</div>
-          </div>
-          <div class="health-item">
-            <div class="health-label">Memory Usage</div>
-            <div class="health-value">{{ systemHealth?.memory_usage }}%</div>
-          </div>
-          <div class="health-item">
-            <div class="health-label">CPU Usage</div>
-            <div class="health-value">{{ systemHealth?.cpu_usage }}%</div>
-          </div>
-          <div class="health-item">
-            <div class="health-label">Database</div>
-            <div class="health-value" [class]="'db-' + systemHealth?.database_status">
-              {{ systemHealth?.database_status | titlecase }}
-            </div>
-          </div>
-        </div>
-      </lib-card>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="quick-actions">
-      <h3>Quick Actions</h3>
-      <div class="actions-grid">
-        <lib-button 
-          variant="primary"
-          (clicked)="seedData()">
-          Seed Sample Data
-        </lib-button>
-        <lib-button 
-          variant="info"
-          (clicked)="exportData()">
-          Export Analytics
-        </lib-button>
-        <lib-button 
-          variant="warning"
-          (clicked)="clearCache()">
-          Clear Cache
-        </lib-button>
-      </div>
-    </div>
-  </div>
+  }
 
   <!-- Error State -->
-  <div *ngIf="error" class="error-container">
-    <lib-card title="Error Loading Dashboard">
-      <p>{{ error }}</p>
-      <lib-button variant="primary" (clicked)="loadDashboardData()">
-        Retry
-      </lib-button>
-    </lib-card>
-  </div>
+  @if (error) {
+    <div class="error-container">
+      <lib-card title="Error Loading Dashboard">
+        <p>{{ error }}</p>
+        <lib-button variant="primary" (clicked)="loadDashboardData()">
+          Retry
+        </lib-button>
+      </lib-card>
+    </div>
+  }
 </div>

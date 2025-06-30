@@ -1,34 +1,38 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { LoadingComponent } from '@microshell/ui';
 import { ApiService } from '@microshell/services';
 
 @Component({
   selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule, LoadingComponent],
   template: `
     <div class="dashboard-container">
       <h1>📊 Dashboard Analytics</h1>
-      
+    
       <div class="metrics-grid">
         <div class="metric-card">
           <h3>Total Users</h3>
           <div class="metric-value">{{ metrics.totalUsers }}</div>
         </div>
-        
+    
         <div class="metric-card">
           <h3>Active Sessions</h3>
           <div class="metric-value">{{ metrics.activeSessions }}</div>
         </div>
-        
+    
         <div class="metric-card">
           <h3>Revenue</h3>
           <div class="metric-value">€{{ metrics.revenue }}</div>
         </div>
-        
+    
         <div class="metric-card">
           <h3>Growth</h3>
           <div class="metric-value">+{{ metrics.growth }}%</div>
         </div>
       </div>
-      
+    
       <div class="charts-section">
         <div class="chart-card">
           <h3>Activity Overview</h3>
@@ -36,7 +40,7 @@ import { ApiService } from '@microshell/services';
             📈 Chart will be rendered here
           </div>
         </div>
-        
+    
         <div class="chart-card">
           <h3>User Distribution</h3>
           <div class="chart-placeholder">
@@ -44,10 +48,12 @@ import { ApiService } from '@microshell/services';
           </div>
         </div>
       </div>
-      
-      <lib-loading *ngIf="loading" message="Loading dashboard data..."></lib-loading>
+    
+      @if (loading) {
+        <lib-loading message="Loading dashboard data..."></lib-loading>
+      }
     </div>
-  `,
+    `,
   styles: [`
     .dashboard-container {
       padding: 20px;

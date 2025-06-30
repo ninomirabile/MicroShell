@@ -1,24 +1,30 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'lib-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div class="card" [class.clickable]="clickable" [class.elevated]="elevated">
-      <div *ngIf="title" class="card-header">
-        <h3 class="card-title">{{ title }}</h3>
-        <div *ngIf="subtitle" class="card-subtitle">{{ subtitle }}</div>
-      </div>
+      @if (title) {
+        <div class="card-header">
+          <h3 class="card-title">{{ title }}</h3>
+          @if (subtitle) {
+            <div class="card-subtitle">{{ subtitle }}</div>
+          }
+        </div>
+      }
       <div class="card-content">
         <ng-content></ng-content>
       </div>
-      <div *ngIf="hasFooter" class="card-footer">
-        <ng-content select="[slot=footer]"></ng-content>
-      </div>
+      @if (hasFooter) {
+        <div class="card-footer">
+          <ng-content select="[slot=footer]"></ng-content>
+        </div>
+      }
     </div>
-  `,
+    `,
   styles: [`
     .card {
       background: white;

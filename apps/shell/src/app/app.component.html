@@ -5,32 +5,36 @@
       <div class="logo">
         <h1>MicroShell</h1>
       </div>
-      <nav class="nav-menu" *ngIf="isAuthenticated">
-        <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
-          <i class="icon-dashboard"></i>
-          Dashboard
-        </a>
-        <a routerLink="/utenti" routerLinkActive="active" class="nav-link">
-          <i class="icon-users"></i>
-          Utenti
-        </a>
-        <a routerLink="/report" routerLinkActive="active" class="nav-link">
-          <i class="icon-report"></i>
-          Report
-        </a>
-      </nav>
-      <div class="user-menu" *ngIf="isAuthenticated">
-        <div class="user-info">
-          <span class="user-name">{{ currentUser?.full_name }}</span>
-          <span class="user-role">{{ currentUser?.role?.name }}</span>
+      @if (isAuthenticated) {
+        <nav class="nav-menu">
+          <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+            <i class="icon-dashboard"></i>
+            Dashboard
+          </a>
+          <a routerLink="/utenti" routerLinkActive="active" class="nav-link">
+            <i class="icon-users"></i>
+            Utenti
+          </a>
+          <a routerLink="/report" routerLinkActive="active" class="nav-link">
+            <i class="icon-report"></i>
+            Report
+          </a>
+        </nav>
+      }
+      @if (isAuthenticated) {
+        <div class="user-menu">
+          <div class="user-info">
+            <span class="user-name">{{ currentUser?.full_name }}</span>
+            <span class="user-role">{{ currentUser?.role?.name }}</span>
+          </div>
+          <div class="user-actions">
+            <button class="btn-logout" (click)="logout()">
+              <i class="icon-logout"></i>
+              Logout
+            </button>
+          </div>
         </div>
-        <div class="user-actions">
-          <button class="btn-logout" (click)="logout()">
-            <i class="icon-logout"></i>
-            Logout
-          </button>
-        </div>
-      </div>
+      }
     </div>
   </header>
 
@@ -38,58 +42,73 @@
   <main class="app-main">
     <div class="content-wrapper">
       <!-- Login Form (shown when not authenticated) -->
-      <div *ngIf="!isAuthenticated" class="login-container">
-        <div class="login-card">
-          <h2>Login to MicroShell</h2>
-          <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-            <div class="form-group">
-              <label for="email">Email</label>
-              <input 
-                id="email"
-                type="email" 
-                formControlName="email"
-                class="form-control"
-                placeholder="Enter your email"
-                [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
-              <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error-message">
-                <span *ngIf="loginForm.get('email')?.errors?.['required']">Email is required</span>
-                <span *ngIf="loginForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+      @if (!isAuthenticated) {
+        <div class="login-container">
+          <div class="login-card">
+            <h2>Login to MicroShell</h2>
+            <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                  id="email"
+                  type="email"
+                  formControlName="email"
+                  class="form-control"
+                  placeholder="Enter your email"
+                  [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+                @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+                  <div class="error-message">
+                    @if (loginForm.get('email')?.errors?.['required']) {
+                      <span>Email is required</span>
+                    }
+                    @if (loginForm.get('email')?.errors?.['email']) {
+                      <span>Please enter a valid email</span>
+                    }
+                  </div>
+                }
               </div>
-            </div>
-            
-            <div class="form-group">
-              <label for="password">Password</label>
-              <input 
-                id="password"
-                type="password" 
-                formControlName="password"
-                class="form-control"
-                placeholder="Enter your password"
-                [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
-              <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="error-message">
-                Password is required
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                  id="password"
+                  type="password"
+                  formControlName="password"
+                  class="form-control"
+                  placeholder="Enter your password"
+                  [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+                @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+                  <div class="error-message">
+                    Password is required
+                  </div>
+                }
               </div>
-            </div>
-            
-            <div *ngIf="loginError" class="error-message">
-              {{ loginError }}
-            </div>
-            
-            <button 
-              type="submit" 
-              class="btn-login"
-              [disabled]="loginForm.invalid || isLoggingIn">
-              <span *ngIf="isLoggingIn">Logging in...</span>
-              <span *ngIf="!isLoggingIn">Login</span>
-            </button>
-          </form>
+              @if (loginError) {
+                <div class="error-message">
+                  {{ loginError }}
+                </div>
+              }
+              <button
+                type="submit"
+                class="btn-login"
+                [disabled]="loginForm.invalid || isLoggingIn">
+                @if (isLoggingIn) {
+                  <span>Logging in...</span>
+                }
+                @if (!isLoggingIn) {
+                  <span>Login</span>
+                }
+              </button>
+            </form>
+          </div>
         </div>
-      </div>
+      }
 
       <!-- Microfrontend Router Outlet (shown when authenticated) -->
-      <div *ngIf="isAuthenticated" class="microfrontend-container">
-        <router-outlet></router-outlet>
-      </div>
+      @if (isAuthenticated) {
+        <div class="microfrontend-container">
+          <router-outlet></router-outlet>
+        </div>
+      }
     </div>
   </main>
 
@@ -102,8 +121,9 @@
 </div>
 
 <!-- Loading Overlay -->
-<lib-loading 
-  *ngIf="isLoading" 
-  [overlay]="true" 
-  [message]="loadingMessage">
-</lib-loading>
+@if (isLoading) {
+  <lib-loading
+    [overlay]="true"
+    [message]="loadingMessage">
+  </lib-loading>
+}

@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { LoadingComponent } from '@microshell/ui';
 import { ApiService } from '@microshell/services';
 
 interface ReportData {
@@ -10,10 +13,12 @@ interface ReportData {
 
 @Component({
   selector: 'app-report',
+  standalone: true,
+  imports: [CommonModule, FormsModule, LoadingComponent],
   template: `
     <div class="report-container">
       <h1>📊 Report & Analytics</h1>
-      
+    
       <div class="report-filters">
         <div class="filter-group">
           <label>Periodo:</label>
@@ -24,7 +29,7 @@ interface ReportData {
             <option value="1y">Ultimo anno</option>
           </select>
         </div>
-        
+    
         <div class="filter-group">
           <label>Categoria:</label>
           <select [(ngModel)]="selectedCategory" (change)="loadReportData()">
@@ -34,12 +39,12 @@ interface ReportData {
             <option value="performance">Performance</option>
           </select>
         </div>
-        
+    
         <button class="btn btn-primary" (click)="exportReport()">
           📥 Esporta Report
         </button>
       </div>
-      
+    
       <div class="report-summary">
         <div class="summary-card">
           <h3>Panoramica Generale</h3>
@@ -68,7 +73,7 @@ interface ReportData {
           </div>
         </div>
       </div>
-      
+    
       <div class="report-charts">
         <div class="chart-card">
           <h3>Performance nel Tempo</h3>
@@ -77,24 +82,26 @@ interface ReportData {
             <br><small>Dati per {{ selectedPeriod === '7d' ? '7 giorni' : selectedPeriod === '30d' ? '30 giorni' : selectedPeriod === '90d' ? '3 mesi' : 'anno' }}</small>
           </div>
         </div>
-        
+    
         <div class="chart-card">
           <h3>Distribuzione per Categoria</h3>
           <div class="category-chart">
-            <div class="category-item" *ngFor="let item of reportData">
-              <div class="category-info">
-                <span class="category-name">{{ item.name }}</span>
-                <span class="category-percentage">{{ item.percentage }}%</span>
+            @for (item of reportData; track item) {
+              <div class="category-item">
+                <div class="category-info">
+                  <span class="category-name">{{ item.name }}</span>
+                  <span class="category-percentage">{{ item.percentage }}%</span>
+                </div>
+                <div class="category-bar">
+                  <div class="category-fill" [style.width.%]="item.percentage"></div>
+                </div>
+                <div class="category-value">{{ item.value }}</div>
               </div>
-              <div class="category-bar">
-                <div class="category-fill" [style.width.%]="item.percentage"></div>
-              </div>
-              <div class="category-value">{{ item.value }}</div>
-            </div>
+            }
           </div>
         </div>
       </div>
-      
+    
       <div class="detailed-report">
         <h3>Report Dettagliato</h3>
         <div class="report-table">
@@ -109,25 +116,29 @@ interface ReportData {
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let item of reportData">
-                <td>{{ item.name }}</td>
-                <td>{{ item.value }}</td>
-                <td>{{ getPreviousValue(item.value, item.percentage) }}</td>
-                <td [class]="'change-' + item.trend">{{ item.percentage > 0 ? '+' : '' }}{{ item.percentage }}%</td>
-                <td>
-                  <span class="trend-indicator" [class]="'trend-' + item.trend">
-                    {{ getTrendIcon(item.trend) }}
-                  </span>
-                </td>
-              </tr>
+              @for (item of reportData; track item) {
+                <tr>
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.value }}</td>
+                  <td>{{ getPreviousValue(item.value, item.percentage) }}</td>
+                  <td [class]="'change-' + item.trend">{{ item.percentage > 0 ? '+' : '' }}{{ item.percentage }}%</td>
+                  <td>
+                    <span class="trend-indicator" [class]="'trend-' + item.trend">
+                      {{ getTrendIcon(item.trend) }}
+                    </span>
+                  </td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
       </div>
-      
-      <lib-loading *ngIf="loading" message="Generazione report..."></lib-loading>
+    
+      @if (loading) {
+        <lib-loading message="Generazione report..."></lib-loading>
+      }
     </div>
-  `,
+    `,
   styles: [`
     .report-container {
       padding: 20px;

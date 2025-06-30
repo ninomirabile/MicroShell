@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 export type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info';
 export type ButtonSize = 'small' | 'medium' | 'large';
@@ -7,19 +7,25 @@ export type ButtonSize = 'small' | 'medium' | 'large';
 @Component({
   selector: 'lib-button',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
-    <button 
+    <button
       [type]="type"
       [disabled]="disabled || loading"
       [class]="getButtonClasses()"
       (click)="onClick($event)">
-      
-      <span *ngIf="loading" class="loading-spinner"></span>
-      <ng-content *ngIf="!loading"></ng-content>
-      <span *ngIf="loading">{{ loadingText }}</span>
+    
+      @if (loading) {
+        <span class="loading-spinner"></span>
+      }
+      @if (!loading) {
+        <ng-content></ng-content>
+      }
+      @if (loading) {
+        <span>{{ loadingText }}</span>
+      }
     </button>
-  `,
+    `,
   styles: [`
     .btn {
       display: inline-flex;

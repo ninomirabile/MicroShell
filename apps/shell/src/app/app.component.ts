@@ -95,7 +95,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   // Utility methods for loading states
-  showLoading(message: string = 'Loading...'): void {
+  showLoading(message = 'Loading...'): void {
     this.isLoading = true;
     this.loadingMessage = message;
   }
