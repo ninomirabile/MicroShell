@@ -47,6 +47,9 @@ All frontend-related jobs (lint, test, build, audit, accessibility, bundle, etc.
 ## SonarCloud and Snyk
 The jobs for code quality (SonarCloud) and deep security scan (Snyk) are disabled by default. To enable them, add the required tokens (`SONAR_TOKEN`, `SNYK_TOKEN`) as GitHub secrets and remove the `if: false` condition in the workflow file. See comments in `.github/workflows/ci-cd.yml` for details.
 
+## Vulnerability Fixes
+The workflow now runs `npm audit fix` after installing dependencies to automatically fix moderate vulnerabilities. If this causes build issues, you can comment out or remove this step.
+
 ---
 
 ## How to Re-enable Advanced Features
