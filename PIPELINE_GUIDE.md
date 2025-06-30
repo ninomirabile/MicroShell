@@ -41,6 +41,14 @@ All logs are uploaded as artifacts for easy debugging.
 
 ---
 
+## Node.js Version Requirement
+All frontend-related jobs (lint, test, build, audit, accessibility, bundle, etc.) require **Node.js >= 20.19.0**. The workflow is configured to always use this version. If you see errors about unsupported Node.js versions, check that all jobs use the correct node-version.
+
+## SonarCloud and Snyk
+The jobs for code quality (SonarCloud) and deep security scan (Snyk) are disabled by default. To enable them, add the required tokens (`SONAR_TOKEN`, `SNYK_TOKEN`) as GitHub secrets and remove the `if: false` condition in the workflow file. See comments in `.github/workflows/ci-cd.yml` for details.
+
+---
+
 ## How to Re-enable Advanced Features
 
 ### **A. SonarCloud (Code Quality Analysis)**

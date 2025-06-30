@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # MicroShell 🚀
 
 [![CI/CD Pipeline](https://github.com/microshell/microshell/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/microshell/microshell/actions/workflows/ci-cd.yml)
@@ -395,4 +395,3 @@ Generate a complete, enterprise-ready, modular application using a microfrontend
 ---
 
 ✅ **Final note**: This project is meant to serve as a scalable and real-world foundation for teams adopting microfrontend architecture. Prioritize modularity, maintainability, and clarity.
->>>>>>> a0d6b4b7a1d9d6fd42b59348e028b16558fec3dc
