@@ -1,3 +1,8 @@
+# CI/CD workflow for MicroShell
+# Node.js version set to 20.19.0 for Angular 20 compatibility
+# SonarCloud and Snyk jobs are disabled by default (missing tokens)
+# To re-enable, add SONAR_TOKEN and SNYK_TOKEN as GitHub secrets and decomment the jobs below
+
 name: CI/CD Pipeline
 
 on:
@@ -86,7 +91,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20.19.0
-          cache: 'npm'
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
@@ -269,8 +274,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          node-version: 20.19.0
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
