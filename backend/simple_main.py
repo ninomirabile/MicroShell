@@ -20,7 +20,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:4200",
-        "http://localhost:4201", 
+        "http://localhost:4201",
         "http://localhost:4202",
         "http://localhost:4203"
     ],
@@ -84,7 +84,7 @@ async def get_users():
         },
         {
             "id": 2,
-            "email": "user@microshell.com", 
+            "email": "user@microshell.com",
             "username": "user",
             "fullName": "Test User",
             "role": "user",
@@ -132,4 +132,4 @@ if __name__ == "__main__":
         port=8000,
         reload=True,
         log_level="info"
-    ) 
+    )

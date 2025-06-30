@@ -24,6 +24,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # Create Base class for models
 Base = declarative_base()
 
+
 def get_db() -> Generator[Session, None, None]:
     """
     Dependency function to get database session.
@@ -33,4 +34,4 @@ def get_db() -> Generator[Session, None, None]:
     try:
         yield db
     finally:
-        db.close() 
+        db.close()

@@ -7,6 +7,7 @@ from pydantic import BaseModel, validator
 from typing import Optional
 from datetime import datetime
 
+
 class MetricBase(BaseModel):
     """Base metric schema with common fields."""
     name: str
@@ -17,16 +18,19 @@ class MetricBase(BaseModel):
     source: Optional[str] = None
     tags: Optional[str] = None  # JSON string
 
+
 class MetricCreate(MetricBase):
     """Schema for metric creation."""
     recorded_at: Optional[datetime] = None
-    
+
     @validator('type')
     def validate_type(cls, v):
         allowed_types = ['performance', 'usage', 'revenue', 'users', 'system']
         if v not in allowed_types:
-            raise ValueError(f'Type must be one of: {", ".join(allowed_types)}')
+            raise ValueError(f'Type must be one of: '
+                           f'{", ".join(allowed_types)}')
         return v
+
 
 class MetricUpdate(BaseModel):
     """Schema for metric updates."""
@@ -37,14 +41,17 @@ class MetricUpdate(BaseModel):
     description: Optional[str] = None
     source: Optional[str] = None
     tags: Optional[str] = None
-    
+
     @validator('type')
     def validate_type(cls, v):
         if v is not None:
-            allowed_types = ['performance', 'usage', 'revenue', 'users', 'system']
+            allowed_types = ['performance', 'usage', 'revenue',
+                           'users', 'system']
             if v not in allowed_types:
-                raise ValueError(f'Type must be one of: {", ".join(allowed_types)}')
+                raise ValueError(f'Type must be one of: '
+                               f'{", ".join(allowed_types)}')
         return v
+
 
 class MetricResponse(MetricBase):
     """Schema for metric response."""
@@ -52,9 +59,10 @@ class MetricResponse(MetricBase):
     recorded_at: datetime
     created_at: datetime
     created_by: Optional[int] = None
-    
+
     class Config:
         from_attributes = True
+
 
 class MetricListResponse(BaseModel):
     """Schema for paginated metrics list response."""
@@ -65,6 +73,7 @@ class MetricListResponse(BaseModel):
     has_next: bool
     has_prev: bool
 
+
 class DashboardSummary(BaseModel):
     """Schema for dashboard summary data."""
     total_users: int
@@ -72,4 +81,4 @@ class DashboardSummary(BaseModel):
     total_revenue: float
     performance_score: float
     system_health: str
-    recent_metrics: list[MetricResponse] 
+    recent_metrics: list[MetricResponse]

@@ -10,8 +10,9 @@ import math
 
 from ..database import get_db
 from ..models.user import User, Role
-from ..schemas.user import UserCreate, UserUpdate, UserResponse, UserListResponse, RoleResponse
-from ..services.auth_service import get_current_user, get_current_admin_user, AuthService
+from ..schemas.user import UserCreate, UserUpdate, UserResponse, RoleResponse
+from ..schemas.user import UserListResponse
+from ..services.auth_service import get_current_admin_user, AuthService
 
 router = APIRouter()
 
@@ -29,7 +30,7 @@ async def get_users(
     Get paginated list of users (admin only).
     """
     query = db.query(User)
-    
+
     # Apply filters
     if search:
         query = query.filter(
@@ -37,25 +38,25 @@ async def get_users(
             (User.username.ilike(f"%{search}%")) |
             (User.full_name.ilike(f"%{search}%"))
         )
-    
+
     if role_filter:
         query = query.join(Role).filter(Role.name == role_filter)
-    
+
     if is_active is not None:
         query = query.filter(User.is_active == is_active)
-    
+
     # Get total count
     total = query.count()
-    
+
     # Apply pagination
     offset = (page - 1) * per_page
     users = query.offset(offset).limit(per_page).all()
-    
+
     # Calculate pagination info
     total_pages = math.ceil(total / per_page)
     has_next = page < total_pages
     has_prev = page > 1
-    
+
     return {
         "users": users,
         "total": total,
@@ -97,7 +98,7 @@ async def create_user(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered"
         )
-    
+
     # Check if username already exists
     existing_user = db.query(User).filter(User.username == user_data.username).first()
     if existing_user:
@@ -105,7 +106,7 @@ async def create_user(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username already taken"
         )
-    
+
     # Get role or default to user role
     if user_data.role_id:
         role = db.query(Role).filter(Role.id == user_data.role_id).first()
@@ -125,7 +126,7 @@ async def create_user(
             db.commit()
             db.refresh(user_role)
         role_id = user_role.id
-    
+
     # Create new user
     hashed_password = AuthService.get_password_hash(user_data.password)
     new_user = User(
@@ -137,11 +138,11 @@ async def create_user(
         is_active=user_data.is_active,
         is_verified=False
     )
-    
+
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    
+
     return new_user
 
 @router.put("/{user_id}", response_model=UserResponse)
@@ -160,7 +161,7 @@ async def update_user(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found"
         )
-    
+
     # Check email uniqueness if email is being updated
     if user_data.email and user_data.email != user.email:
         existing_user = db.query(User).filter(User.email == user_data.email).first()
@@ -169,7 +170,7 @@ async def update_user(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email already registered"
             )
-    
+
     # Check username uniqueness if username is being updated
     if user_data.username and user_data.username != user.username:
         existing_user = db.query(User).filter(User.username == user_data.username).first()
@@ -178,7 +179,7 @@ async def update_user(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Username already taken"
             )
-    
+
     # Check role validity if role is being updated
     if user_data.role_id:
         role = db.query(Role).filter(Role.id == user_data.role_id).first()
@@ -187,15 +188,15 @@ async def update_user(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid role ID"
             )
-    
+
     # Update user fields
     update_data = user_data.dict(exclude_unset=True)
     for field, value in update_data.items():
         setattr(user, field, value)
-    
+
     db.commit()
     db.refresh(user)
-    
+
     return user
 
 @router.delete("/{user_id}")
@@ -213,17 +214,17 @@ async def delete_user(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found"
         )
-    
+
     # Prevent admin from deleting themselves
     if user.id == current_user.id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Cannot delete your own account"
         )
-    
+
     db.delete(user)
     db.commit()
-    
+
     return {"message": "User deleted successfully"}
 
 @router.get("/roles/", response_model=list[RoleResponse])
@@ -252,10 +253,10 @@ async def activate_user(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found"
         )
-    
+
     user.is_active = True
     db.commit()
-    
+
     return {"message": "User activated successfully"}
 
 @router.post("/{user_id}/deactivate")
@@ -273,15 +274,15 @@ async def deactivate_user(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found"
         )
-    
+
     # Prevent admin from deactivating themselves
     if user.id == current_user.id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Cannot deactivate your own account"
         )
-    
+
     user.is_active = False
     db.commit()
-    
-    return {"message": "User deactivated successfully"} 
+
+    return {"message": "User deactivated successfully"}

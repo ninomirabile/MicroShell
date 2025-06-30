@@ -1,20 +1,20 @@
 """
 FastAPI MicroShell Backend Application
-Main entry point for the API server with JWT authentication, CORS, and database integration.
+Main entry point for the API server with JWT authentication,
+CORS, and database integration.
 """
 
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPBearer
 from contextlib import asynccontextmanager
 import uvicorn
-from typing import List
 
-from .database import engine, get_db
+from .database import engine
 from .models import Base
 from .routes import auth, users, dashboard, reports
-from .services.auth_service import verify_token
 from .config import settings
+
 
 # Create database tables on startup
 @asynccontextmanager
@@ -23,6 +23,7 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     yield
     # Shutdown (if needed)
+
 
 # Initialize FastAPI app with lifespan events
 app = FastAPI(
@@ -46,6 +47,7 @@ app.add_middleware(
 # Security scheme
 security = HTTPBearer()
 
+
 # Health check endpoint
 @app.get("/health", tags=["Health"])
 async def health_check():
@@ -56,11 +58,13 @@ async def health_check():
         "version": "1.0.0"
     }
 
+
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(users.router, prefix="/api/users", tags=["Users"])
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["Dashboard"])
 app.include_router(reports.router, prefix="/api/reports", tags=["Reports"])
+
 
 # Root endpoint
 @app.get("/", tags=["Root"])
@@ -73,6 +77,7 @@ async def root():
         "health": "/health"
     }
 
+
 if __name__ == "__main__":
     uvicorn.run(
         "app.main:app",
@@ -80,4 +85,4 @@ if __name__ == "__main__":
         port=settings.PORT,
         reload=settings.DEBUG,
         log_level="info" if not settings.DEBUG else "debug"
-    ) 
+    )

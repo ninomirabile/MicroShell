@@ -3,21 +3,20 @@ Database initialization script for MicroShell Backend.
 Creates tables, roles, and initial admin user.
 """
 
-import asyncio
-from sqlalchemy.orm import Session
 from app.database import SessionLocal, engine
 from app.models import Base, User, Role
 from app.services.auth_service import AuthService
 from app.config import settings
 
+
 def init_database():
     """Initialize database with tables and initial data."""
     print("🔄 Creating database tables...")
-    
+
     # Create all tables
     Base.metadata.create_all(bind=engine)
     print("✅ Database tables created successfully")
-    
+
     # Create initial data
     db = SessionLocal()
     try:
@@ -30,7 +29,7 @@ def init_database():
             )
             db.add(admin_role)
             print("✅ Admin role created")
-        
+
         user_role = db.query(Role).filter(Role.name == "user").first()
         if not user_role:
             user_role = Role(
@@ -39,15 +38,17 @@ def init_database():
             )
             db.add(user_role)
             print("✅ User role created")
-        
+
         db.commit()
         db.refresh(admin_role)
         db.refresh(user_role)
-        
+
         # Create admin user if it doesn't exist
-        admin_user = db.query(User).filter(User.email == settings.ADMIN_EMAIL).first()
+        admin_user = db.query(User).filter(
+            User.email == settings.ADMIN_EMAIL).first()
         if not admin_user:
-            hashed_password = AuthService.get_password_hash(settings.ADMIN_PASSWORD)
+            hashed_password = AuthService.get_password_hash(
+                settings.ADMIN_PASSWORD)
             admin_user = User(
                 email=settings.ADMIN_EMAIL,
                 username="admin",
@@ -63,7 +64,7 @@ def init_database():
             print(f"🔑 Admin password: {settings.ADMIN_PASSWORD}")
         else:
             print(f"ℹ️  Admin user already exists: {settings.ADMIN_EMAIL}")
-        
+
         # Create some sample users
         sample_users = [
             {
@@ -79,11 +80,13 @@ def init_database():
                 "password": "password123"
             }
         ]
-        
+
         for user_data in sample_users:
-            existing_user = db.query(User).filter(User.email == user_data["email"]).first()
+            existing_user = db.query(User).filter(
+                User.email == user_data["email"]).first()
             if not existing_user:
-                hashed_password = AuthService.get_password_hash(user_data["password"])
+                hashed_password = AuthService.get_password_hash(
+                    user_data["password"])
                 new_user = User(
                     email=user_data["email"],
                     username=user_data["username"],
@@ -95,10 +98,10 @@ def init_database():
                 )
                 db.add(new_user)
                 print(f"✅ Sample user created: {user_data['email']}")
-        
+
         db.commit()
         print("🎉 Database initialization completed successfully!")
-        
+
     except Exception as e:
         print(f"❌ Error during database initialization: {str(e)}")
         db.rollback()
@@ -106,6 +109,7 @@ def init_database():
     finally:
         db.close()
 
+
 if __name__ == "__main__":
     print("🚀 Starting MicroShell Database Initialization...")
-    init_database() 
+    init_database()

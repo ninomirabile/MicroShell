@@ -11,4 +11,4 @@ from .logs import Log
 from ..database import Base
 
 # Export all models
-__all__ = ["User", "Role", "Metric", "Log", "Base"] 
+__all__ = ["User", "Role", "Metric", "Log", "Base"]

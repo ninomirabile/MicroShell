@@ -1,0 +1,286 @@
+./app/__init__.py:1:41: W291 trailing whitespace
+./app/__init__.py:1:42: W292 no newline at end of file
+./app/config.py:11:1: E302 expected 2 blank lines, found 1
+./app/config.py:13:1: W293 blank line contains whitespace
+./app/config.py:16:1: W293 blank line contains whitespace
+./app/config.py:22:1: W293 blank line contains whitespace
+./app/config.py:27:1: W293 blank line contains whitespace
+./app/config.py:39:1: W293 blank line contains whitespace
+./app/config.py:43:1: W293 blank line contains whitespace
+./app/config.py:49:1: E305 expected 2 blank lines after class or function definition, found 1
+./app/config.py:49:22: W291 trailing whitespace
+./app/config.py:49:23: W292 no newline at end of file
+./app/database.py:27:1: E302 expected 2 blank lines, found 1
+./app/database.py:36:19: W291 trailing whitespace
+./app/database.py:36:20: W292 no newline at end of file
+./app/main.py:3:89: E501 line too long (92 > 88 characters)
+./app/main.py:6:1: F401 'fastapi.HTTPException' imported but unused
+./app/main.py:6:1: F401 'fastapi.Depends' imported but unused
+./app/main.py:6:1: F401 'fastapi.status' imported but unused
+./app/main.py:8:1: F401 'fastapi.security.HTTPAuthorizationCredentials' imported but unused
+./app/main.py:11:1: F401 'typing.List' imported but unused
+./app/main.py:13:1: F401 '.database.get_db' imported but unused
+./app/main.py:16:1: F401 '.services.auth_service.verify_token' imported but unused
+./app/main.py:20:1: E302 expected 2 blank lines, found 1
+./app/main.py:50:1: E302 expected 2 blank lines, found 1
+./app/main.py:66:1: E302 expected 2 blank lines, found 1
+./app/main.py:83:6: W291 trailing whitespace
+./app/main.py:83:7: W292 no newline at end of file
+./app/models/__init__.py:14:52: W291 trailing whitespace
+./app/models/__init__.py:14:53: W292 no newline at end of file
+./app/models/logs.py:13:1: E302 expected 2 blank lines, found 1
+./app/models/logs.py:21:1: E302 expected 2 blank lines, found 1
+./app/models/logs.py:30:1: E302 expected 2 blank lines, found 1
+./app/models/logs.py:33:1: W293 blank line contains whitespace
+./app/models/logs.py:38:1: W293 blank line contains whitespace
+./app/models/logs.py:45:1: W293 blank line contains whitespace
+./app/models/logs.py:49:1: W293 blank line contains whitespace
+./app/models/logs.py:52:1: W293 blank line contains whitespace
+./app/models/logs.py:55:1: W293 blank line contains whitespace
+./app/models/logs.py:57:89: E501 line too long (121 > 88 characters)
+./app/models/logs.py:57:122: W291 trailing whitespace
+./app/models/logs.py:57:123: W292 no newline at end of file
+./app/models/metrics.py:7:1: F401 'sqlalchemy.orm.relationship' imported but unused
+./app/models/metrics.py:13:1: E302 expected 2 blank lines, found 1
+./app/models/metrics.py:21:1: E302 expected 2 blank lines, found 1
+./app/models/metrics.py:24:1: W293 blank line contains whitespace
+./app/models/metrics.py:31:1: W293 blank line contains whitespace
+./app/models/metrics.py:35:1: W293 blank line contains whitespace
+./app/models/metrics.py:39:1: W293 blank line contains whitespace
+./app/models/metrics.py:42:1: W293 blank line contains whitespace
+./app/models/metrics.py:44:89: E501 line too long (100 > 88 characters)
+./app/models/metrics.py:44:101: W291 trailing whitespace
+./app/models/metrics.py:44:102: W292 no newline at end of file
+./app/models/user.py:6:1: F401 'sqlalchemy.Enum' imported but unused
+./app/models/user.py:10:1: F401 'datetime' imported but unused
+./app/models/user.py:14:1: E302 expected 2 blank lines, found 1
+./app/models/user.py:19:1: E302 expected 2 blank lines, found 1
+./app/models/user.py:22:1: W293 blank line contains whitespace
+./app/models/user.py:28:1: W293 blank line contains whitespace
+./app/models/user.py:32:1: E302 expected 2 blank lines, found 1
+./app/models/user.py:35:1: W293 blank line contains whitespace
+./app/models/user.py:43:1: W293 blank line contains whitespace
+./app/models/user.py:47:1: W293 blank line contains whitespace
+./app/models/user.py:52:1: W293 blank line contains whitespace
+./app/models/user.py:54:89: E501 line too long (108 > 88 characters)
+./app/models/user.py:54:109: W291 trailing whitespace
+./app/models/user.py:54:110: W292 no newline at end of file
+./app/routes/__init__.py:1:44: W291 trailing whitespace
+./app/routes/__init__.py:1:45: W292 no newline at end of file
+./app/routes/auth.py:13:89: E501 line too long (101 > 88 characters)
+./app/routes/auth.py:21:1: E302 expected 2 blank lines, found 1
+./app/routes/auth.py:29:89: E501 line too long (95 > 88 characters)
+./app/routes/auth.py:36:1: W293 blank line contains whitespace
+./app/routes/auth.py:42:1: W293 blank line contains whitespace
+./app/routes/auth.py:46:1: W293 blank line contains whitespace
+./app/routes/auth.py:49:89: E501 line too long (104 > 88 characters)
+./app/routes/auth.py:54:1: W293 blank line contains whitespace
+./app/routes/auth.py:62:1: E302 expected 2 blank lines, found 1
+./app/routes/auth.py:76:1: W293 blank line contains whitespace
+./app/routes/auth.py:84:1: W293 blank line contains whitespace
+./app/routes/auth.py:93:1: W293 blank line contains whitespace
+./app/routes/auth.py:105:1: W293 blank line contains whitespace
+./app/routes/auth.py:109:1: W293 blank line contains whitespace
+./app/routes/auth.py:112:1: E302 expected 2 blank lines, found 1
+./app/routes/auth.py:127:1: W293 blank line contains whitespace
+./app/routes/auth.py:134:1: W293 blank line contains whitespace
+./app/routes/auth.py:141:1: W293 blank line contains whitespace
+./app/routes/auth.py:144:89: E501 line too long (108 > 88 characters)
+./app/routes/auth.py:149:1: W293 blank line contains whitespace
+./app/routes/auth.py:156:1: W293 blank line contains whitespace
+./app/routes/auth.py:157:5: F841 local variable 'e' is assigned to but never used
+./app/routes/auth.py:163:1: E302 expected 2 blank lines, found 1
+./app/routes/auth.py:172:1: E302 expected 2 blank lines, found 1
+./app/routes/auth.py:182:89: E501 line too long (101 > 88 characters)
+./app/routes/auth.py:187:1: W293 blank line contains whitespace
+./app/routes/auth.py:189:89: E501 line too long (92 > 88 characters)
+./app/routes/auth.py:191:1: W293 blank line contains whitespace
+./app/routes/auth.py:194:1: E302 expected 2 blank lines, found 1
+./app/routes/auth.py:201:50: W291 trailing whitespace
+./app/routes/auth.py:201:51: W292 no newline at end of file
+./app/routes/dashboard.py:9:1: F401 'typing.List' imported but unused
+./app/routes/dashboard.py:16:89: E501 line too long (110 > 88 characters)
+./app/routes/dashboard.py:21:1: E302 expected 2 blank lines, found 1
+./app/routes/dashboard.py:31:57: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+./app/routes/dashboard.py:32:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:39:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:45:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:52:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:55:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:65:1: E302 expected 2 blank lines, found 1
+./app/routes/dashboard.py:80:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:84:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:87:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:90:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:93:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:96:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:99:89: E501 line too long (91 > 88 characters)
+./app/routes/dashboard.py:100:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:106:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:116:1: E302 expected 2 blank lines, found 1
+./app/routes/dashboard.py:136:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:140:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:143:1: E302 expected 2 blank lines, found 1
+./app/routes/dashboard.py:160:1: E302 expected 2 blank lines, found 1
+./app/routes/dashboard.py:176:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:181:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:184:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:187:1: E302 expected 2 blank lines, found 1
+./app/routes/dashboard.py:202:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:205:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:208:1: E302 expected 2 blank lines, found 1
+./app/routes/dashboard.py:218:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:223:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:234:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:237:1: E302 expected 2 blank lines, found 1
+./app/routes/dashboard.py:247:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:252:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:263:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:266:1: E302 expected 2 blank lines, found 1
+./app/routes/dashboard.py:278:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:282:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:285:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:297:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:309:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:321:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:333:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:337:1: W293 blank line contains whitespace
+./app/routes/dashboard.py:338:89: W291 trailing whitespace
+./app/routes/dashboard.py:338:90: W292 no newline at end of file
+./app/routes/reports.py:6:1: F401 'fastapi.HTTPException' imported but unused
+./app/routes/reports.py:6:1: F401 'fastapi.status' imported but unused
+./app/routes/reports.py:6:1: F401 'fastapi.Query' imported but unused
+./app/routes/reports.py:7:1: F401 'fastapi.responses.StreamingResponse' imported but unused
+./app/routes/reports.py:10:1: F401 'typing.List' imported but unused
+./app/routes/reports.py:20:1: F401 '..schemas.metrics.MetricResponse' imported but unused
+./app/routes/reports.py:21:1: F401 '..schemas.logs.LogResponse' imported but unused
+./app/routes/reports.py:26:1: E302 expected 2 blank lines, found 1
+./app/routes/reports.py:42:1: W293 blank line contains whitespace
+./app/routes/reports.py:49:1: W293 blank line contains whitespace
+./app/routes/reports.py:52:1: W293 blank line contains whitespace
+./app/routes/reports.py:55:1: W293 blank line contains whitespace
+./app/routes/reports.py:70:1: W293 blank line contains whitespace
+./app/routes/reports.py:73:1: W293 blank line contains whitespace
+./app/routes/reports.py:75:1: W293 blank line contains whitespace
+./app/routes/reports.py:87:1: W293 blank line contains whitespace
+./app/routes/reports.py:90:1: W293 blank line contains whitespace
+./app/routes/reports.py:91:89: E501 line too long (115 > 88 characters)
+./app/routes/reports.py:92:1: W293 blank line contains whitespace
+./app/routes/reports.py:103:1: W293 blank line contains whitespace
+./app/routes/reports.py:106:1: W293 blank line contains whitespace
+./app/routes/reports.py:107:89: E501 line too long (108 > 88 characters)
+./app/routes/reports.py:108:1: W293 blank line contains whitespace
+./app/routes/reports.py:149:1: E302 expected 2 blank lines, found 1
+./app/routes/reports.py:164:1: W293 blank line contains whitespace
+./app/routes/reports.py:175:1: W293 blank line contains whitespace
+./app/routes/reports.py:188:1: W293 blank line contains whitespace
+./app/routes/reports.py:191:44: F821 undefined name 'Role'
+./app/routes/reports.py:191:62: F821 undefined name 'Role'
+./app/routes/reports.py:191:89: E501 line too long (135 > 88 characters)
+./app/routes/reports.py:193:29: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+./app/routes/reports.py:194:1: W293 blank line contains whitespace
+./app/routes/reports.py:201:1: W293 blank line contains whitespace
+./app/routes/reports.py:236:17: F811 redefinition of unused 'status' from line 6
+./app/routes/reports.py:240:1: E302 expected 2 blank lines, found 1
+./app/routes/reports.py:255:1: W293 blank line contains whitespace
+./app/routes/reports.py:267:1: W293 blank line contains whitespace
+./app/routes/reports.py:280:1: W293 blank line contains whitespace
+./app/routes/reports.py:291:89: E501 line too long (91 > 88 characters)
+./app/routes/reports.py:292:1: W293 blank line contains whitespace
+./app/routes/reports.py:301:1: W293 blank line contains whitespace
+./app/routes/reports.py:339:1: E302 expected 2 blank lines, found 1
+./app/routes/reports.py:355:1: W293 blank line contains whitespace
+./app/routes/reports.py:362:1: W293 blank line contains whitespace
+./app/routes/reports.py:365:1: W293 blank line contains whitespace
+./app/routes/reports.py:367:1: W293 blank line contains whitespace
+./app/routes/reports.py:371:1: W293 blank line contains whitespace
+./app/routes/reports.py:377:1: W293 blank line contains whitespace
+./app/routes/reports.py:391:1: W293 blank line contains whitespace
+./app/routes/reports.py:395:1: W293 blank line contains whitespace
+./app/routes/reports.py:396:89: E501 line too long (96 > 88 characters)
+./app/routes/reports.py:397:1: W293 blank line contains whitespace
+./app/routes/reports.py:404:1: E302 expected 2 blank lines, found 1
+./app/routes/reports.py:420:1: W293 blank line contains whitespace
+./app/routes/reports.py:427:1: W293 blank line contains whitespace
+./app/routes/reports.py:430:1: W293 blank line contains whitespace
+./app/routes/reports.py:432:1: W293 blank line contains whitespace
+./app/routes/reports.py:460:1: W293 blank line contains whitespace
+./app/routes/reports.py:462:89: E501 line too long (97 > 88 characters)
+./app/routes/reports.py:463:1: W293 blank line contains whitespace
+./app/routes/reports.py:470:1: E302 expected 2 blank lines, found 1
+./app/routes/reports.py:481:89: E501 line too long (89 > 88 characters)
+./app/routes/reports.py:497:1: W293 blank line contains whitespace
+./app/routes/reports.py:498:36: W291 trailing whitespace
+./app/routes/reports.py:498:37: W292 no newline at end of file
+./app/routes/users.py:13:89: E501 line too long (95 > 88 characters)
+./app/routes/users.py:14:1: F401 '..services.auth_service.get_current_user' imported but unused
+./app/routes/users.py:14:89: E501 line too long (89 > 88 characters)
+./app/routes/users.py:18:1: E302 expected 2 blank lines, found 1
+./app/routes/users.py:32:1: W293 blank line contains whitespace
+./app/routes/users.py:40:1: W293 blank line contains whitespace
+./app/routes/users.py:43:1: W293 blank line contains whitespace
+./app/routes/users.py:46:1: W293 blank line contains whitespace
+./app/routes/users.py:49:1: W293 blank line contains whitespace
+./app/routes/users.py:53:1: W293 blank line contains whitespace
+./app/routes/users.py:58:1: W293 blank line contains whitespace
+./app/routes/users.py:68:1: E302 expected 2 blank lines, found 1
+./app/routes/users.py:85:1: E302 expected 2 blank lines, found 1
+./app/routes/users.py:100:1: W293 blank line contains whitespace
+./app/routes/users.py:108:1: W293 blank line contains whitespace
+./app/routes/users.py:128:1: W293 blank line contains whitespace
+./app/routes/users.py:140:1: W293 blank line contains whitespace
+./app/routes/users.py:144:1: W293 blank line contains whitespace
+./app/routes/users.py:147:1: E302 expected 2 blank lines, found 1
+./app/routes/users.py:163:1: W293 blank line contains whitespace
+./app/routes/users.py:172:1: W293 blank line contains whitespace
+./app/routes/users.py:175:89: E501 line too long (90 > 88 characters)
+./app/routes/users.py:181:1: W293 blank line contains whitespace
+./app/routes/users.py:190:1: W293 blank line contains whitespace
+./app/routes/users.py:195:1: W293 blank line contains whitespace
+./app/routes/users.py:198:1: W293 blank line contains whitespace
+./app/routes/users.py:201:1: E302 expected 2 blank lines, found 1
+./app/routes/users.py:216:1: W293 blank line contains whitespace
+./app/routes/users.py:223:1: W293 blank line contains whitespace
+./app/routes/users.py:226:1: W293 blank line contains whitespace
+./app/routes/users.py:229:1: E302 expected 2 blank lines, found 1
+./app/routes/users.py:240:1: E302 expected 2 blank lines, found 1
+./app/routes/users.py:255:1: W293 blank line contains whitespace
+./app/routes/users.py:258:1: W293 blank line contains whitespace
+./app/routes/users.py:261:1: E302 expected 2 blank lines, found 1
+./app/routes/users.py:276:1: W293 blank line contains whitespace
+./app/routes/users.py:283:1: W293 blank line contains whitespace
+./app/routes/users.py:286:1: W293 blank line contains whitespace
+./app/routes/users.py:287:56: W291 trailing whitespace
+./app/schemas/__init__.py:16:2: W291 trailing whitespace
+./app/schemas/auth.py:67:17: W291 trailing whitespace
+./app/schemas/logs.py:74:37: W291 trailing whitespace
+./app/schemas/metrics.py:31:28: E128 continuation line under-indented for visual indent
+./app/schemas/metrics.py:49:28: E128 continuation line under-indented for visual indent
+./app/schemas/metrics.py:52:32: E128 continuation line under-indented for visual indent
+./app/schemas/metrics.py:84:41: W291 trailing whitespace
+./app/schemas/user.py:46:28: E128 continuation line under-indented for visual indent
+./app/schemas/user.py:65:32: E128 continuation line under-indented for visual indent
+./app/schemas/user.py:89:19: W291 trailing whitespace
+./app/services/auth_service.py:41:27: E128 continuation line under-indented for visual indent
+./app/services/auth_service.py:52:32: E128 continuation line under-indented for visual indent
+./app/services/auth_service.py:63:32: E128 continuation line under-indented for visual indent
+./app/services/auth_service.py:71:32: E128 continuation line under-indented for visual indent
+./app/services/auth_service.py:82:25: E128 continuation line under-indented for visual indent
+./app/services/auth_service.py:154:43: W291 trailing whitespace
+./init_db.py:115:20: W291 trailing whitespace
+./simple_main.py:33:1: E302 expected 2 blank lines, found 1
+./simple_main.py:43:1: E302 expected 2 blank lines, found 1
+./simple_main.py:54:1: E302 expected 2 blank lines, found 1
+./simple_main.py:73:1: E302 expected 2 blank lines, found 1
+./simple_main.py:96:1: E302 expected 2 blank lines, found 1
+./simple_main.py:107:1: E302 expected 2 blank lines, found 1
+./simple_main.py:117:1: E302 expected 2 blank lines, found 1
+./simple_main.py:135:6: W291 trailing whitespace
+./tests/test_main.py:39:1: W293 blank line contains whitespace
+./tests/test_main.py:50:89: E501 line too long (89 > 88 characters)
+./tests/test_main.py:51:1: W293 blank line contains whitespace
+./tests/test_main.py:64:1: W293 blank line contains whitespace
+./tests/test_main.py:70:1: W293 blank line contains whitespace
+./tests/test_main.py:81:1: W293 blank line contains whitespace
+./tests/test_main.py:85:1: W293 blank line contains whitespace
+./tests/test_main.py:87:75: W291 trailing whitespace

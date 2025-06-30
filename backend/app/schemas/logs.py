@@ -7,6 +7,7 @@ from pydantic import BaseModel, validator
 from typing import Optional
 from datetime import datetime
 
+
 class LogBase(BaseModel):
     """Base log schema with common fields."""
     level: str  # LogLevel enum value
@@ -19,32 +20,38 @@ class LogBase(BaseModel):
     metadata: Optional[str] = None  # JSON string
     stack_trace: Optional[str] = None
 
+
 class LogCreate(LogBase):
     """Schema for log creation."""
     user_id: Optional[int] = None
-    
+
     @validator('level')
     def validate_level(cls, v):
         allowed_levels = ['debug', 'info', 'warning', 'error', 'critical']
         if v.lower() not in allowed_levels:
-            raise ValueError(f'Level must be one of: {", ".join(allowed_levels)}')
+            raise ValueError(f'Level must be one of: '
+                             f'{", ".join(allowed_levels)}')
         return v.lower()
-    
+
     @validator('category')
     def validate_category(cls, v):
-        allowed_categories = ['auth', 'user', 'system', 'api', 'security', 'performance']
+        allowed_categories = ['auth', 'user', 'system', 'api',
+                              'security', 'performance']
         if v.lower() not in allowed_categories:
-            raise ValueError(f'Category must be one of: {", ".join(allowed_categories)}')
+            raise ValueError(f'Category must be one of: '
+                             f'{", ".join(allowed_categories)}')
         return v.lower()
+
 
 class LogResponse(LogBase):
     """Schema for log response."""
     id: int
     user_id: Optional[int] = None
     created_at: datetime
-    
+
     class Config:
         from_attributes = True
+
 
 class LogListResponse(BaseModel):
     """Schema for paginated logs list response."""
@@ -55,6 +62,7 @@ class LogListResponse(BaseModel):
     has_next: bool
     has_prev: bool
 
+
 class LogStats(BaseModel):
     """Schema for log statistics."""
     total_logs: int
@@ -63,4 +71,4 @@ class LogStats(BaseModel):
     info_count: int
     debug_count: int
     critical_count: int
-    recent_errors: list[LogResponse] 
+    recent_errors: list[LogResponse]

@@ -13,4 +13,4 @@ __all__ = [
     "UserBase", "UserCreate", "UserUpdate", "UserResponse", "RoleResponse",
     "MetricBase", "MetricCreate", "MetricUpdate", "MetricResponse",
     "LogBase", "LogCreate", "LogResponse"
-] 
+]
