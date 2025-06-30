@@ -148,9 +148,15 @@ jobs:
         working-directory: ./backend
         run: |
           pip install flake8 black isort
-          flake8 . --max-line-length=88 --extend-ignore=E203,W503
-          black --check .
-          isort --check-only .
+          flake8 . --max-line-length=88 --extend-ignore=E203,W503 > ../backend-lint.log 2>&1
+          black --check . >> ../backend-lint.log 2>&1
+          isort --check-only . >> ../backend-lint.log 2>&1
+
+      - name: Upload lint log
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-lint-log
+          path: backend-lint.log
 
       - name: Test backend
         working-directory: ./backend
@@ -158,11 +164,23 @@ jobs:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
           SECRET_KEY: test-secret-key-for-ci
         run: |
-          python -m pytest tests/ -v --tb=short
+          python -m pytest tests/ -v --tb=short > ../backend-test.log 2>&1
+
+      - name: Upload test log
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-log
+          path: backend-test.log
 
       - name: Build backend Docker image
         run: |
-          docker build -t microshell-backend:latest ./backend
+          docker build -t microshell-backend:latest ./backend > backend-docker-build.log 2>&1
+
+      - name: Upload backend docker build log
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-docker-build-log
+          path: backend-docker-build.log
 
   # ===== SECURITY SCANS =====
   security-scan:
@@ -181,10 +199,17 @@ jobs:
           format: 'sarif'
           output: 'trivy-results.sarif'
 
-      - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@v3
+      - name: Upload Trivy scan log
+        if: always()
+        run: |
+          cat trivy-results.sarif > trivy.log 2>&1 || true
+        continue-on-error: true
+
+      - name: Upload Trivy log
+        uses: actions/upload-artifact@v4
         with:
-          sarif_file: 'trivy-results.sarif'
+          name: trivy-log
+          path: trivy.log
 
   # ===== BUILD AND PUSH DOCKER IMAGES =====
   docker-build:
