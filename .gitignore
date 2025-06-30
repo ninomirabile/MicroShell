@@ -90,9 +90,25 @@ venv.bak/
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
+.env.staging
 *.pem
 *.key
 *.crt
+
+# ===== SENSITIVE DATA & DATABASES =====
+# SQLite databases (may contain real user data)
+*.db
+*.sqlite
+*.sqlite3
+# Database dumps
+*.sql
+*.dump
+
+# API Keys and secrets
+secrets/
+.secrets/
+config/secrets.*
 
 # ===== DOCKER & INFRASTRUCTURE =====
 # Docker volumes data (but keep compose files)
@@ -112,6 +128,18 @@ monitoring/*.log
 # ===== BUILD ARTIFACTS =====
 *.tgz
 *.tar.gz
+
+# ===== SECURITY & BACKUP FILES =====
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+
+# OS generated files
+*.swp
+*.swo
+*~
 
 # ===== EXPLICITLY PRESERVE IMPORTANT FILES =====
 # CI/CD and Configuration files
