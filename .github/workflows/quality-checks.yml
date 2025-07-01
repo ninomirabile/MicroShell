@@ -9,6 +9,8 @@ on:
 env:
   NODE_VERSION: '20.19.0'
   PYTHON_VERSION: '3.11'
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
 jobs:
   # ===== DEPENDENCY AUDIT =====
@@ -47,6 +49,8 @@ jobs:
 
   # ===== CODE QUALITY =====
   code-quality:
+    # NOTA: Non è possibile condizionare l'intero job su un secret/env senza errori di linter.
+    # Usa lo step di skip + if sugli step successivi per compatibilità massima.
     name: Code Quality Analysis
     runs-on: ubuntu-latest
     env:
@@ -58,37 +62,31 @@ jobs:
             echo "SONAR_TOKEN not set, skipping code quality analysis."
             exit 0
           fi
-
       - name: Checkout code
         if: ${{ env.SONAR_TOKEN != '' }}
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: SonarCloud Scan
         if: ${{ env.SONAR_TOKEN != '' }}
         uses: SonarSource/sonarqube-scan-action@v5.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
-
       - name: Setup Node.js
         if: ${{ env.SONAR_TOKEN != '' }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-
       - name: Install dependencies
         if: ${{ env.SONAR_TOKEN != '' }}
         run: npm ci
-
       - name: Run ESLint with detailed reporting
         if: ${{ env.SONAR_TOKEN != '' }}
         run: |
           npx nx run-many --target=lint --all --format=json --output-file=eslint-report.json
           npx nx run-many --target=lint --all --format=html --output-file=eslint-report.html
-
       - name: Upload ESLint reports
         if: ${{ env.SONAR_TOKEN != '' }}
         uses: actions/upload-artifact@v4
@@ -162,6 +160,8 @@ jobs:
 
   # ===== SECURITY SCANS =====
   security-deep-scan:
+    # NOTA: Non è possibile condizionare l'intero job su un secret/env senza errori di linter.
+    # Usa lo step di skip + if sugli step successivi per compatibilità massima.
     name: Deep Security Scan
     runs-on: ubuntu-latest
     env:
@@ -173,11 +173,9 @@ jobs:
             echo "SNYK_TOKEN not set, skipping deep security scan."
             exit 0
           fi
-
       - name: Checkout code
         if: ${{ env.SNYK_TOKEN != '' }}
         uses: actions/checkout@v4
-
       - name: Run Snyk to check for vulnerabilities
         if: ${{ env.SNYK_TOKEN != '' }}
         uses: snyk/actions/node@master
@@ -185,21 +183,17 @@ jobs:
           SNYK_TOKEN: ${{ env.SNYK_TOKEN }}
         with:
           args: --severity-threshold=high
-
       - name: Run CodeQL Analysis
         if: ${{ env.SNYK_TOKEN != '' }}
         uses: github/codeql-action/init@v3
         with:
           languages: javascript, python
-
       - name: Autobuild
         if: ${{ env.SNYK_TOKEN != '' }}
         uses: github/codeql-action/autobuild@v3
-
       - name: Perform CodeQL Analysis
         if: ${{ env.SNYK_TOKEN != '' }}
         uses: github/codeql-action/analyze@v3
-
       - name: OWASP ZAP Baseline Scan
         if: ${{ env.SNYK_TOKEN != '' }}
         uses: zaproxy/action-baseline@v0.10.0
@@ -279,7 +273,7 @@ jobs:
 
       - name: Run accessibility tests
         run: |
-          npm install -g @axe-core/cli
+          npm install -g @axe-core/cli@4
           axe http://localhost:4200 --format json --output=shell-a11y-report.json
           axe http://localhost:4201 --format json --output=dashboard-a11y-report.json
           axe http://localhost:4202 --format json --output=utenti-a11y-report.json

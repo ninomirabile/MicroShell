@@ -50,6 +50,19 @@ The jobs for code quality (SonarCloud) and deep security scan (Snyk) are disable
 ## Vulnerability Fixes
 The workflow now runs `npm audit fix` after installing dependencies to automatically fix moderate vulnerabilities. If this causes build issues, you can comment out or remove this step.
 
+## Quality & Security Jobs: Skipping When Tokens Are Missing
+
+Some jobs in the pipeline (SonarCloud for code quality, Snyk for security) require secrets (`SONAR_TOKEN`, `SNYK_TOKEN`).
+
+- If these tokens are **not set**, the related jobs are **automatically skipped**.
+- The pipeline will **not fail** and will show these jobs as "skipped" in the summary.
+- This is achieved by a skip step at the start of each job and conditional execution of all subsequent steps.
+- This approach is the most robust and compatible with GitHub Actions, avoiding linter errors and false negatives.
+
+**To enable these jobs:**
+- Add the required tokens as repository secrets (see `README_CI_SECRETS.md`).
+- On the next pipeline run, the jobs will be executed and included in the quality summary.
+
 ---
 
 ## How to Re-enable Advanced Features
