@@ -49,40 +49,48 @@ jobs:
   code-quality:
     name: Code Quality Analysis
     runs-on: ubuntu-latest
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     steps:
       - name: Skip if SONAR_TOKEN is missing
         run: |
-          if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
+          if [ -z "$SONAR_TOKEN" ]; then
             echo "SONAR_TOKEN not set, skipping code quality analysis."
             exit 0
           fi
 
       - name: Checkout code
+        if: ${{ env.SONAR_TOKEN != '' }}
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: SonarCloud Scan
+        if: ${{ env.SONAR_TOKEN != '' }}
         uses: SonarSource/sonarqube-scan-action@v5.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
 
       - name: Setup Node.js
+        if: ${{ env.SONAR_TOKEN != '' }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
       - name: Install dependencies
+        if: ${{ env.SONAR_TOKEN != '' }}
         run: npm ci
 
       - name: Run ESLint with detailed reporting
+        if: ${{ env.SONAR_TOKEN != '' }}
         run: |
           npx nx run-many --target=lint --all --format=json --output-file=eslint-report.json
           npx nx run-many --target=lint --all --format=html --output-file=eslint-report.html
 
       - name: Upload ESLint reports
+        if: ${{ env.SONAR_TOKEN != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: eslint-reports
@@ -156,36 +164,44 @@ jobs:
   security-deep-scan:
     name: Deep Security Scan
     runs-on: ubuntu-latest
+    env:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
     steps:
       - name: Skip if SNYK_TOKEN is missing
         run: |
-          if [ -z "${{ secrets.SNYK_TOKEN }}" ]; then
+          if [ -z "$SNYK_TOKEN" ]; then
             echo "SNYK_TOKEN not set, skipping deep security scan."
             exit 0
           fi
 
       - name: Checkout code
+        if: ${{ env.SNYK_TOKEN != '' }}
         uses: actions/checkout@v4
 
       - name: Run Snyk to check for vulnerabilities
+        if: ${{ env.SNYK_TOKEN != '' }}
         uses: snyk/actions/node@master
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_TOKEN: ${{ env.SNYK_TOKEN }}
         with:
           args: --severity-threshold=high
 
       - name: Run CodeQL Analysis
+        if: ${{ env.SNYK_TOKEN != '' }}
         uses: github/codeql-action/init@v3
         with:
           languages: javascript, python
 
       - name: Autobuild
+        if: ${{ env.SNYK_TOKEN != '' }}
         uses: github/codeql-action/autobuild@v3
 
       - name: Perform CodeQL Analysis
+        if: ${{ env.SNYK_TOKEN != '' }}
         uses: github/codeql-action/analyze@v3
 
       - name: OWASP ZAP Baseline Scan
+        if: ${{ env.SNYK_TOKEN != '' }}
         uses: zaproxy/action-baseline@v0.10.0
         with:
           target: 'http://localhost:8000'
