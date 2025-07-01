@@ -320,6 +320,6 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
-**Made with ❤️ by the MicroShell Team**
+**Made with ❤️ by Antonino Mirabile**
 
-For questions or support, please [open an issue](https://github.com/microshell/microshell/issues/new) or contact us at support@microshell.com.
+For questions or support, please [open an issue](https://github.com/microshell/microshell/issues/new)
