@@ -274,10 +274,11 @@ jobs:
       - name: Run accessibility tests
         run: |
           npm install -g @axe-core/cli@4
-          axe http://localhost:4200 --format json --output=shell-a11y-report.json
-          axe http://localhost:4201 --format json --output=dashboard-a11y-report.json
-          axe http://localhost:4202 --format json --output=utenti-a11y-report.json
-          axe http://localhost:4203 --format json --output=report-a11y-report.json
+          export AXE_BIN=$(npm root -g)/@axe-core/cli/bin/axe.js
+          node $AXE_BIN http://localhost:4200 --format json --output=shell-a11y-report.json
+          node $AXE_BIN http://localhost:4201 --format json --output=dashboard-a11y-report.json
+          node $AXE_BIN http://localhost:4202 --format json --output=utenti-a11y-report.json
+          node $AXE_BIN http://localhost:4203 --format json --output=report-a11y-report.json
 
       - name: Upload accessibility reports
         uses: actions/upload-artifact@v4
