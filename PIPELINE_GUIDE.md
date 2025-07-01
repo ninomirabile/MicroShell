@@ -65,6 +65,16 @@ Some jobs in the pipeline (SonarCloud for code quality, Snyk for security) requi
 
 ---
 
+## Accessibility Tests (axe-core/cli)
+
+- The pipeline runs accessibility tests on all frontend apps using `@axe-core/cli` v4.
+- Reports are now generated in **HTML format** (not JSON) using the `--output` option.
+- You can download and view these HTML reports from the workflow artifacts after each run.
+- Example files: `shell-a11y-report.html`, `dashboard-a11y-report.html`, etc.
+- This is due to upstream changes: axe-core/cli v4+ only supports HTML/CSV output in the open source version.
+
+---
+
 ## How to Re-enable Advanced Features
 
 ### **A. SonarCloud (Code Quality Analysis)**
