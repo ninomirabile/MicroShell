@@ -241,6 +241,7 @@ jobs:
 
   # ===== ACCESSIBILITY TESTS =====
   accessibility-tests:
+    if: ${{ false }} # Temporarily disabled: axe-core/cli output not supported in CI. See PIPELINE_GUIDE.md
     name: Accessibility Tests
     runs-on: ubuntu-latest
     steps:

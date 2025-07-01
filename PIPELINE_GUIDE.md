@@ -73,6 +73,9 @@ Some jobs in the pipeline (SonarCloud for code quality, Snyk for security) requi
 - Example files: `shell-a11y-report.html`, `dashboard-a11y-report.html`, etc.
 - This is due to upstream changes: axe-core/cli v4+ only supports HTML/CSV output in the open source version.
 
+> **Note:**
+> The accessibility test job is currently **disabled in CI** because the open source axe-core/cli no longer reliably supports machine-readable output (JSON/HTML) in CI environments. If you need to run accessibility checks, you can do so locally using `@axe-core/cli` or Lighthouse and review the results manually.
+
 ---
 
 ## How to Re-enable Advanced Features
