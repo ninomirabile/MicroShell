@@ -276,10 +276,10 @@ jobs:
           npm install -g @axe-core/cli@4
           which axe
           axe --version
-          axe http://localhost:4200 --output-format json --output=shell-a11y-report.json
-          axe http://localhost:4201 --output-format json --output=dashboard-a11y-report.json
-          axe http://localhost:4202 --output-format json --output=utenti-a11y-report.json
-          axe http://localhost:4203 --output-format json --output=report-a11y-report.json
+          axe http://localhost:4200 --reporter=json --output=shell-a11y-report.json
+          axe http://localhost:4201 --reporter=json --output=dashboard-a11y-report.json
+          axe http://localhost:4202 --reporter=json --output=utenti-a11y-report.json
+          axe http://localhost:4203 --reporter=json --output=report-a11y-report.json
 
       - name: Upload accessibility reports
         uses: actions/upload-artifact@v4
