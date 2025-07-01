@@ -1,11 +1,10 @@
-
 # MicroShell 🚀
 
 [![CI/CD Pipeline](https://github.com/microshell/microshell/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/microshell/microshell/actions/workflows/ci-cd.yml)
 [![Quality Checks](https://github.com/microshell/microshell/actions/workflows/quality-checks.yml/badge.svg)](https://github.com/microshell/microshell/actions/workflows/quality-checks.yml)
 [![Release](https://github.com/microshell/microshell/actions/workflows/release.yml/badge.svg)](https://github.com/microshell/microshell/actions/workflows/release.yml)
 
-A comprehensive **microfrontend application** built with **Angular 17**, **FastAPI**, and **PostgreSQL** using **Nx workspace** architecture and **Module Federation**.
+A comprehensive **microfrontend application** built with **Angular 20**, **FastAPI**, and **PostgreSQL** using **Nx workspace** architecture and **Module Federation**.
 
 ## 🏗️ Architecture Overview
 
@@ -289,7 +288,7 @@ ALLOWED_ORIGINS=https://your-domain.com
 ## 📋 Requirements
 
 ### Development Requirements
-- **Node.js** 18+
+- **Node.js** 20.19+
 - **npm** 8+
 - **Python** 3.11+
 - **Docker** 20+
@@ -334,7 +333,7 @@ Generate a complete, enterprise-ready, modular application using a microfrontend
 
 ## ⚙️ Tech Stack
 
-- **Shell (container)**: Angular 17 + Nx Monorepo
+- **Shell (container)**: Angular 20 + Nx Monorepo
 - **Microfrontend 1**: `dashboard` (Angular, route `/dashboard`, calls backend metrics API)
 - **Microfrontend 2**: `utenti` (Angular, route `/utenti`, CRUD with reactive forms and validations)
 - **Microfrontend 3**: `report` (Angular, route `/report`, charts + PDF export)
