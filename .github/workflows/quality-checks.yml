@@ -1,9 +1,6 @@
 name: Quality Checks
 
 on:
-  schedule:
-    # Run every night at 2 AM UTC
-    - cron: '0 2 * * *'
   push:
     branches: [main]
   pull_request:
@@ -50,12 +47,16 @@ jobs:
 
   # ===== CODE QUALITY =====
   code-quality:
-    if: ${{ env.SONAR_TOKEN != '' }}
     name: Code Quality Analysis
     runs-on: ubuntu-latest
-    env:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     steps:
+      - name: Skip if SONAR_TOKEN is missing
+        run: |
+          if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
+            echo "SONAR_TOKEN not set, skipping code quality analysis."
+            exit 0
+          fi
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -153,12 +154,16 @@ jobs:
 
   # ===== SECURITY SCANS =====
   security-deep-scan:
-    if: ${{ env.SNYK_TOKEN != '' }}
     name: Deep Security Scan
     runs-on: ubuntu-latest
-    env:
-      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
     steps:
+      - name: Skip if SNYK_TOKEN is missing
+        run: |
+          if [ -z "${{ secrets.SNYK_TOKEN }}" ]; then
+            echo "SNYK_TOKEN not set, skipping deep security scan."
+            exit 0
+          fi
+
       - name: Checkout code
         uses: actions/checkout@v4
 
