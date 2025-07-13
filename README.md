@@ -127,6 +127,17 @@ npx nx affected:apps
 npx nx affected:libs
 ```
 
+## ℹ️ Nx Cloud Disabilitato
+
+Per semplicità e per evitare errori di autorizzazione nelle pipeline CI/CD, Nx Cloud è stato disabilitato in questo workspace. Nx Cloud offre funzionalità avanzate di caching distribuito e analytics, ma richiede la connessione e l'autorizzazione entro 3 giorni dalla creazione della workspace. Se non viene collegato, blocca l'esecuzione delle build dopo pochi giorni.
+
+**Motivazione della scelta:**
+- Il progetto può essere buildato e testato senza dipendenze da servizi esterni.
+- Nessun rischio di blocco delle pipeline per workspace non autorizzate.
+- Semplicità per chi clona o contribuisce al repository.
+
+Se desideri abilitare Nx Cloud, puoi farlo eseguendo `npx nx connect` e seguendo le istruzioni, oppure consultando la documentazione ufficiale: https://nx.app/cloud
+
 ## 🔄 CI/CD Pipeline
 
 ### Workflow Overview
