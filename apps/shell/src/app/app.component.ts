@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
@@ -29,11 +29,12 @@ export class AppComponent implements OnInit, OnDestroy {
   
   private destroy$ = new Subject<void>();
 
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-    private fb: FormBuilder
-  ) {
+  // Inject dependencies using the new Angular 20+ syntax
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private fb = inject(FormBuilder);
+
+  constructor() {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]]
@@ -53,9 +54,9 @@ export class AppComponent implements OnInit, OnDestroy {
     // Subscribe to authentication state changes
     this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(user => {
-        this.currentUser = user;
-        this.isAuthenticated = !!user;
+      .subscribe(currentUser => {
+        this.currentUser = currentUser;
+        this.isAuthenticated = !!currentUser;
         
         if (this.isAuthenticated && this.router.url === '/') {
           this.router.navigate(['/dashboard']);
@@ -76,7 +77,7 @@ export class AppComponent implements OnInit, OnDestroy {
       this.authService.login(credentials)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: (user) => {
+          next: () => {
             this.isLoggingIn = false;
             this.router.navigate(['/dashboard']);
           },

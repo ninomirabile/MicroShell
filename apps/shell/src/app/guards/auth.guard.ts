@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 import { Observable, map } from 'rxjs';
 import { AuthService } from '@microshell/services';
@@ -8,10 +8,9 @@ import { AuthService } from '@microshell/services';
 })
 export class AuthGuard implements CanActivate {
   
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  // Inject dependencies using the new Angular 20+ syntax
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   canActivate(): Observable<boolean> {
     return this.authService.currentUser$.pipe(

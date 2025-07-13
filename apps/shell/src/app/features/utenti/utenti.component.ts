@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LoadingComponent } from '@microshell/ui';
@@ -42,22 +42,22 @@ interface User {
           <form [formGroup]="userForm" (ngSubmit)="addUser()">
             <div class="form-row">
               <div class="form-group">
-                <label>Email</label>
-                <input type="email" formControlName="email" class="form-control">
+                <label for="email-input">Email</label>
+                <input id="email-input" type="email" formControlName="email" class="form-control">
               </div>
               <div class="form-group">
-                <label>Username</label>
-                <input type="text" formControlName="username" class="form-control">
+                <label for="username-input">Username</label>
+                <input id="username-input" type="text" formControlName="username" class="form-control">
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label>Nome Completo</label>
-                <input type="text" formControlName="fullName" class="form-control">
+                <label for="fullname-input">Nome Completo</label>
+                <input id="fullname-input" type="text" formControlName="fullName" class="form-control">
               </div>
               <div class="form-group">
-                <label>Ruolo</label>
-                <select formControlName="role" class="form-control">
+                <label for="role-select">Ruolo</label>
+                <select id="role-select" formControlName="role" class="form-control">
                   <option value="user">Utente</option>
                   <option value="admin">Amministratore</option>
                   <option value="manager">Manager</option>
@@ -355,10 +355,11 @@ export class UtentiComponent implements OnInit {
   users: User[] = [];
   filteredUsers: User[] = [];
 
-  constructor(
-    private fb: FormBuilder,
-    private apiService: ApiService
-  ) {
+  // Inject dependencies using the new Angular 20+ syntax
+  private fb = inject(FormBuilder);
+  private apiService = inject(ApiService);
+
+  constructor() {
     this.userForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       username: ['', [Validators.required, Validators.minLength(3)]],

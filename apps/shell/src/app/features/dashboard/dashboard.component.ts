@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoadingComponent } from '@microshell/ui';
 import { ApiService } from '@microshell/services';
@@ -138,7 +138,8 @@ export class DashboardComponent implements OnInit {
     growth: 0
   };
 
-  constructor(private apiService: ApiService) {}
+  // Inject dependencies using the new Angular 20+ syntax
+  private apiService = inject(ApiService);
 
   ngOnInit() {
     this.loadDashboardData();

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoadingComponent } from '@microshell/ui';
@@ -21,8 +21,8 @@ interface ReportData {
     
       <div class="report-filters">
         <div class="filter-group">
-          <label>Periodo:</label>
-          <select [(ngModel)]="selectedPeriod" (change)="loadReportData()">
+          <label for="period-select">Periodo:</label>
+          <select id="period-select" [(ngModel)]="selectedPeriod" (change)="loadReportData()">
             <option value="7d">Ultimi 7 giorni</option>
             <option value="30d">Ultimi 30 giorni</option>
             <option value="90d">Ultimi 3 mesi</option>
@@ -31,8 +31,8 @@ interface ReportData {
         </div>
     
         <div class="filter-group">
-          <label>Categoria:</label>
-          <select [(ngModel)]="selectedCategory" (change)="loadReportData()">
+          <label for="category-select">Categoria:</label>
+          <select id="category-select" [(ngModel)]="selectedCategory" (change)="loadReportData()">
             <option value="all">Tutte</option>
             <option value="users">Utenti</option>
             <option value="revenue">Ricavi</option>
@@ -461,7 +461,8 @@ export class ReportComponent implements OnInit {
   
   reportData: ReportData[] = [];
 
-  constructor(private apiService: ApiService) {}
+  // Inject dependencies using the new Angular 20+ syntax
+  private apiService = inject(ApiService);
 
   ngOnInit() {
     this.loadReportData();
