@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "MicroShell - Full Microfrontend Application with Angular and FastAPI",
   "author": "MicroShell Team",
-  "license": "MIT",
+  "license": "CC-BY-NC-4.0",
   "scripts": {
     "build": "nx build",
     "test": "nx test",
